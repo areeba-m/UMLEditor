@@ -41,15 +41,6 @@ public class UMLEditorForm extends JFrame {
     JPanel umlClassPanel;
     JPanel umlUseCasePanel;
 
-    // class diagram components
-    JLabel labelClass;
-    JLabel labelInterface;
-    JLabel labelAssociation;
-    JLabel labelInheritance;
-    JLabel labelAggregation;
-    JLabel labelComposition;
-
-
 
     public UMLEditorForm(){
 
