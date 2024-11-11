@@ -2,10 +2,11 @@ package BusinessLayer.Diagrams;
 
 import BusinessLayer.Components.UMLComponent;
 
+import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
 
-public abstract class UMLDiagram {
+public abstract class UMLDiagram extends JPanel {
     String name;
     ArrayList<UMLComponent> components;
 

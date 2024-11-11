@@ -1,5 +1,10 @@
 package ui;
 
+import BusinessLayer.Components.ClassDiagramComponents.ClassBox;
+import BusinessLayer.Components.UseCaseDiagramComponents.Actor;
+import BusinessLayer.Components.UseCaseDiagramComponents.UseCase;
+import BusinessLayer.Diagrams.UseCaseDiagram;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -36,11 +41,6 @@ public class UMLEditorForm extends JFrame {
     JTextArea textArea;
     JScrollPane textAreaScrollPane;
     JPanel panelBottomEast;
-
-    // grid components
-    JPanel umlClassPanel;
-    JPanel umlUseCasePanel;
-
 
     public UMLEditorForm(){
 
@@ -107,9 +107,6 @@ public class UMLEditorForm extends JFrame {
         panelGrid.setPreferredSize(new Dimension(1000,1000));
         panelGrid.setBackground(Color.gray);
 
-        umlClassPanel = createUMLClassPanel();
-        umlUseCasePanel = createUMLUseCasePanel();
-
         diagramTypeScrollPane = new JScrollPane(panelGrid);
 
         panelTopEast = new JPanel();
@@ -141,49 +138,6 @@ public class UMLEditorForm extends JFrame {
         add(panelEast, BorderLayout.EAST);
     }
 
-    private JPanel createUMLClassPanel() {
-        JPanel panel = new JPanel(new GridLayout(0, 1));
-
-        JLabel classLabel = new JLabel("Class");
-        classLabel.setIcon(new ImageIcon("icons/class.png"));
-        panel.add(classLabel);
-
-        JLabel interfaceLabel = new JLabel("Interface");
-        interfaceLabel.setIcon(new ImageIcon("icons/interface.png"));
-        panel.add(interfaceLabel);
-
-        JLabel associationLabel = new JLabel("Association");
-        associationLabel.setIcon(new ImageIcon("icons/association.png"));
-        panel.add(associationLabel);
-
-        JLabel inheritanceLabel = new JLabel("Inheritance");
-        inheritanceLabel.setIcon(new ImageIcon("icons/inheritance.png"));
-        panel.add(inheritanceLabel);
-
-        return panel;
-    }
-
-    private JPanel createUMLUseCasePanel() {
-        JPanel panel = new JPanel(new GridLayout(0, 1));
-
-        JLabel actorLabel = new JLabel("Actor");
-        actorLabel.setIcon(new ImageIcon("icons/actor.png"));
-        panel.add(actorLabel);
-
-        JLabel useCaseLabel = new JLabel("Use Case");
-        useCaseLabel.setIcon(new ImageIcon("icons/usecase.png"));
-        panel.add(useCaseLabel);
-
-        JLabel includeLabel = new JLabel("Include");
-        includeLabel.setIcon(new ImageIcon("icons/include.png"));
-        panel.add(includeLabel);
-
-        JLabel extendLabel = new JLabel("Extend");
-        extendLabel.setIcon(new ImageIcon("icons/extend.png"));
-        panel.add(extendLabel);
-
-        return panel;
-    }
 
     public static void setUIFont(Font font) {
         java.util.Enumeration<Object> keys = UIManager.getDefaults().keys();
@@ -200,11 +154,30 @@ public class UMLEditorForm extends JFrame {
         cmbDiagramType.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                String diagramType = (String) cmbDiagramType.getSelectedItem();
+                loadComponentsForSelectedDiagram(diagramType);
 
             }
         });
     }
 
+    private void loadComponentsForSelectedDiagram(String diagramType) {
+        panelGrid.removeAll(); // Clear grid area before adding new components
+
+        if ("UML Class".equals(diagramType)) {
+
+            // Add more UML class components if needed
+        } else if ("UML Use Case".equals(diagramType)) {
+            panelGrid.add(new UseCase("Use Case"));
+            panelGrid.add(new UseCase("Use Case 2"));
+            panelGrid.add(new UseCase("Use Case 3"));
+
+            // Add more UML use case components if needed
+        }
+
+        panelGrid.revalidate();
+        panelGrid.repaint();
+    }
 
     public static void main(String[] args){
         UMLEditorForm app = new UMLEditorForm();
