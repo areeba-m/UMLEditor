@@ -1,9 +1,7 @@
 package ui;
 
 import BusinessLayer.Components.ClassDiagramComponents.ClassBox;
-import BusinessLayer.Components.UseCaseDiagramComponents.Actor;
-import BusinessLayer.Components.UseCaseDiagramComponents.UseCase;
-import BusinessLayer.Diagrams.UseCaseDiagram;
+import BusinessLayer.Diagrams.ClassDiagram;
 
 import javax.swing.*;
 import java.awt.*;
@@ -41,6 +39,11 @@ public class UMLEditorForm extends JFrame {
     JTextArea textArea;
     JScrollPane textAreaScrollPane;
     JPanel panelBottomEast;
+
+    // grid components
+    JPanel umlClassPanel;
+    JPanel umlUseCasePanel;
+
 
     public UMLEditorForm(){
 
@@ -105,7 +108,10 @@ public class UMLEditorForm extends JFrame {
 
         panelGrid = new JPanel(new GridLayout(0,2));
         panelGrid.setPreferredSize(new Dimension(1000,1000));
-        panelGrid.setBackground(Color.gray);
+        //panelGrid.setBackground(Color.gray);
+
+//        umlClassPanel = createUMLClassPanel();
+//        umlUseCasePanel = createUMLUseCasePanel();
 
         diagramTypeScrollPane = new JScrollPane(panelGrid);
 
@@ -138,7 +144,6 @@ public class UMLEditorForm extends JFrame {
         add(panelEast, BorderLayout.EAST);
     }
 
-
     public static void setUIFont(Font font) {
         java.util.Enumeration<Object> keys = UIManager.getDefaults().keys();
         while (keys.hasMoreElements()) {
@@ -154,30 +159,21 @@ public class UMLEditorForm extends JFrame {
         cmbDiagramType.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                String diagramType = (String) cmbDiagramType.getSelectedItem();
-                loadComponentsForSelectedDiagram(diagramType);
+                if ("UML Class".equals(cmbDiagramType.getSelectedItem())) {
+                    // Clear previous components from panelGrid if switching diagrams
+                    panelGrid.removeAll();
 
+                    // Create and initialize ClassDiagram with the panelGrid
+                    ClassDiagram classDiagram = new ClassDiagram(panelGrid);
+
+                    // Revalidate and repaint the panel to show changes
+                    panelGrid.revalidate();
+                    panelGrid.repaint();
+                }
             }
         });
     }
 
-    private void loadComponentsForSelectedDiagram(String diagramType) {
-        panelGrid.removeAll(); // Clear grid area before adding new components
-
-        if ("UML Class".equals(diagramType)) {
-
-            // Add more UML class components if needed
-        } else if ("UML Use Case".equals(diagramType)) {
-            panelGrid.add(new UseCase("Use Case"));
-            panelGrid.add(new UseCase("Use Case 2"));
-            panelGrid.add(new UseCase("Use Case 3"));
-
-            // Add more UML use case components if needed
-        }
-
-        panelGrid.revalidate();
-        panelGrid.repaint();
-    }
 
     public static void main(String[] args){
         UMLEditorForm app = new UMLEditorForm();

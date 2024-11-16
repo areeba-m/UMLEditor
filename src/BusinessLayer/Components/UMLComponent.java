@@ -4,25 +4,29 @@ import javax.swing.*;
 import java.awt.*;
 
 public abstract class UMLComponent extends JComponent {
-    int x;
-    int y;
-    Point location;
+//    int x;
+//    int y;
+protected Point point;
 
     public abstract void draw(Graphics g);
 
     public int getX() {
-        return x;
+
+        return (int) point.getX();
     }
 
     public void setX(int x) {
-        this.x = x;
+
+        this.point.x = x;
     }
 
     public int getY() {
-        return y;
+
+        return (int) point.getY();
     }
 
     public void setY(int y) {
-        this.y = y;
+
+        this.point.y = y;
     }
 }
