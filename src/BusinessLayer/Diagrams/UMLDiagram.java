@@ -4,9 +4,10 @@ import BusinessLayer.Components.UMLComponent;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.dnd.DropTargetListener;
 import java.util.ArrayList;
 
-public abstract class UMLDiagram extends JPanel {
+public abstract class UMLDiagram extends JPanel implements DropTargetListener {
     String name;
     ArrayList<UMLComponent> components;
 

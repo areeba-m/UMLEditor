@@ -3,6 +3,8 @@ package ui;
 import BusinessLayer.Components.ClassDiagramComponents.ClassBox;
 import BusinessLayer.Components.UseCaseDiagramComponents.Actor;
 import BusinessLayer.Components.UseCaseDiagramComponents.UseCase;
+import BusinessLayer.Diagrams.ClassDiagram;
+import BusinessLayer.Diagrams.UMLDiagram;
 import BusinessLayer.Diagrams.UseCaseDiagram;
 
 import javax.swing.*;
@@ -26,7 +28,11 @@ public class UMLEditorForm extends JFrame {
     JMenuItem generateCodeFiles;
 
     // canvas components
-    DrawingCanvas drawingCanvas;
+    // ree comes in
+    //DrawingCanvas drawingCanvas;
+    UMLDiagram workingDiagram;
+    // ree goes
+
     JScrollPane canvasScrollPane;
 
     // diagram components
@@ -50,9 +56,9 @@ public class UMLEditorForm extends JFrame {
 
         setUIFont(new Font("Segoe UI Emoji", Font.PLAIN, 14));
 
-        prepareMenuBar();
+        prepareMenuBar();prepareDiagramType();
         prepareCanvas();
-        prepareDiagramType();
+
 
         loadGrid();
 
@@ -87,8 +93,13 @@ public class UMLEditorForm extends JFrame {
     }
 
     private void prepareCanvas(){
-        drawingCanvas = new DrawingCanvas();
-        canvasScrollPane = new JScrollPane(drawingCanvas);
+        // ree in
+
+        //drawingCanvas = new DrawingCanvas();
+        workingDiagram = new UseCaseDiagram(panelGrid); // THIS SHOULD BE CLASS DIAGRAM BY DEFAULT
+
+        //canvasScrollPane = new JScrollPane(drawingCanvas);
+        canvasScrollPane = new JScrollPane(workingDiagram);
         canvasScrollPane.setPreferredSize(new Dimension(800,600));
 
         add(canvasScrollPane, BorderLayout.CENTER);
@@ -168,9 +179,8 @@ public class UMLEditorForm extends JFrame {
 
             // Add more UML class components if needed
         } else if ("UML Use Case".equals(diagramType)) {
-            panelGrid.add(new UseCase("Use Case"));
-            panelGrid.add(new UseCase("Use Case 2"));
-            panelGrid.add(new UseCase("Use Case 3"));
+            //panelGrid.add(new UseCase("Use Case"));
+            workingDiagram = new UseCaseDiagram(panelGrid);
 
             // Add more UML use case components if needed
         }

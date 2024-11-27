@@ -1,33 +1,17 @@
 package BusinessLayer.Components.UseCaseDiagramComponents;
 
-import BusinessLayer.Components.UMLComponent;
-
-import javax.swing.*;
 import java.awt.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 
-public class UseCase extends UMLComponent {
-    String name;
+public class UseCase extends UseCaseComponent {
+    int width;
+    int height;
 
     public UseCase(String name) {
+        super();
         this.name = name;
         setPreferredSize(new Dimension(200,200));
 
-        setTransferHandler(new TransferHandler("name")); // "name" is a placeholder property
-
-        addMouseMotionListener(new MouseAdapter() {
-            @Override
-            public void mouseDragged(MouseEvent e) {
-                getTransferHandler().exportAsDrag(UseCase.this, e, TransferHandler.COPY);
-            }
-        });
-
-    }
-
-    @Override
-    public void draw(Graphics g) {
-
+        this.point = new Point(0,0);
     }
 
     @Override
@@ -35,8 +19,10 @@ public class UseCase extends UMLComponent {
         super.paintComponent(g);
         Graphics2D g2 = (Graphics2D) g;
 
-        int width = getWidth()/2;
-        int height = getHeight()/8;
+        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+        width = getWidth()/2;
+        height = getHeight()/8;
 
         g2.setColor(Color.white);
         g2.fillOval(0,0, width, height);
