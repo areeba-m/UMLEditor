@@ -3,30 +3,43 @@ package BusinessLayer.Components.UseCaseDiagramComponents;
 import BusinessLayer.Components.UMLComponent;
 
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
-public class UseCaseDiagramRelationship extends UseCaseComponent {
+import static com.sun.java.accessibility.util.AWTEventMonitor.addActionListener;
+
+public class UseCaseDiagramRelationship extends UMLComponent {
+
+    private Point startPoint; // Start of the line
+    private Point endPoint;   // End of the line
+
+    private boolean draggingStart = false;
+    private boolean draggingEnd = false;
+
     UMLComponent from;
     UMLComponent to;
-    String type;
     String label;
 
-    public UseCaseDiagramRelationship(UMLComponent from, UMLComponent to, String type) {
+    public UseCaseDiagramRelationship(UMLComponent from, UMLComponent to, String name) {
         super();
         this.from = from;
         this.to = to;
-        this.type = type;
+        this.name = name;
+        setPreferredSize(new Dimension(200,200));
 
-        if (type.equalsIgnoreCase("Include")) {
+        if (name.equalsIgnoreCase("Include")) {
             this.label = "<<include>>";
-        } else if (type.equalsIgnoreCase("Exclude")) {
+        } else if (name.equalsIgnoreCase("Exclude")) {
             this.label = "<<exclude>>";
         } else {
             this.label = ""; // No label for simple associations
         }
-    }
 
-    public void setType(String type) {
-        this.type = type;
+        this.startPoint = from != null ? from.getLocation() : new Point(50, 50); // Default positions
+        this.endPoint = to != null ? to.getLocation() : new Point(150, 50);
+
     }
 
     @Override
@@ -34,27 +47,16 @@ public class UseCaseDiagramRelationship extends UseCaseComponent {
         super.paintComponent(g);
         Graphics2D g2d = (Graphics2D) g;
 
-        // Enable anti-aliasing
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
         // Determine positions
-        int x1, y1, x2, y2;
-        if (from == null || to == null) {
-            // Use placeholders coordinates
-            x1 = 50;
-            y1 = 50;
-            x2 = 150;
-            y2 = 150;
-        } else {
-            // Get actual component positions
-            x1 = from.getX() + from.getWidth() / 2;
-            y1 = from.getY() + from.getHeight() / 2;
-            x2 = to.getX() + to.getWidth() / 2;
-            y2 = to.getY() + to.getHeight() / 2;
-        }
+        int x1 = startPoint.x;
+        int x2 = endPoint.x;
+        int y1 = startPoint.y;
+        int y2 = endPoint.y;
 
         // Draw the line
-        if (type.equalsIgnoreCase("Association")) {
+        if (name.equalsIgnoreCase("Association")) {
             // Solid line for associations
             g2d.setStroke(new BasicStroke(2));
         } else {
@@ -74,6 +76,12 @@ public class UseCaseDiagramRelationship extends UseCaseComponent {
             //g2d.setFont(new Font("Arial", Font.PLAIN, 12));
             g2d.setColor(Color.BLACK);
             g2d.drawString(label, labelX, labelY - 5);
+        }
+        // Optional: Draw small circles around the start and end points for better visibility
+        if(isSelected()) {
+            g2d.setColor(Color.RED);
+            g2d.fillOval(startPoint.x - 5, startPoint.y - 5, 10, 10); // Circle around the start point
+            g2d.fillOval(endPoint.x - 5, endPoint.y - 5, 10, 10);     // Circle around the end point
         }
     }
 
@@ -97,4 +105,96 @@ public class UseCaseDiagramRelationship extends UseCaseComponent {
         g2d.drawLine(x2, y2, xArrow2, yArrow2);
     }
 
+    private void updateBounds() {
+        // Calculate the bounding box for the arrow
+        int x = Math.min(startPoint.x, endPoint.x);
+        int y = Math.min(startPoint.y, endPoint.y);
+        int width = Math.abs(startPoint.x - endPoint.x);
+        int height = Math.abs(startPoint.y - endPoint.y);
+
+        // Update the component's bounds
+        setBounds(x - 10, y - 10, width + 20, height + 20); // Add padding for arrowhead
+
+        // Adjust startPoint and endPoint relative to the new bounds
+        startPoint = new Point(startPoint.x - getX(), startPoint.y - getY());
+        endPoint = new Point(endPoint.x - getX(), endPoint.y - getY());
+
+        revalidate();
+        repaint();
+    }
+
+    private boolean isNearStartPoint(MouseEvent e) {
+        int threshold = 15; // Distance threshold to detect if near the start point
+        return e.getPoint().distance(startPoint) < threshold;
+    }
+
+    private boolean isNearEndPoint(MouseEvent e) {
+        int threshold = 15; // Distance threshold to detect if near the end point
+        return e.getPoint().distance(endPoint) < threshold;
+    }
+
+    public void handleUseCaseRelationshipMousePressed(MouseEvent e){
+        if (isNearStartPoint(e)) {
+            draggingStart = true;
+        } else if (isNearEndPoint(e)) {
+            draggingEnd = true;
+        }
+    }
+
+    public void handleUseCaseRelationshipMouseReleased(MouseEvent e){
+        draggingStart = false;
+        draggingEnd = false;
+    }
+
+    public void handleUseCaseRelationshipMouseDragged(MouseEvent e){
+
+        if (draggingStart) {
+            startPoint = e.getPoint();
+            repaint();
+        } else if (draggingEnd) {
+            endPoint = e.getPoint();
+            repaint();
+        }
+        //updateBounds();
+    }
+
+    // Optional: Getters and setters for start and end points
+    public Point getStartPoint() {
+        return startPoint;
+    }
+
+    public void setStartPoint(Point startPoint) {
+        this.startPoint = startPoint;
+        repaint();
+    }
+
+    public Point getEndPoint() {
+        return endPoint;
+    }
+
+    public void setEndPoint(Point endPoint) {
+        this.endPoint = endPoint;
+        repaint();
+    }
+
+    public UMLComponent getFrom() {
+        return from;
+    }
+
+    public void setFrom(UMLComponent from) {
+        this.from = from;
+    }
+
+    public UMLComponent getTo() {
+        return to;
+    }
+
+    public void setTo(UMLComponent to) {
+        this.to = to;
+    }
+
+    @Override
+    public void draw(Graphics g) {
+
+    }
 }

@@ -1,8 +1,10 @@
 package BusinessLayer.Components.UseCaseDiagramComponents;
 
+import BusinessLayer.Components.UMLComponent;
+
 import java.awt.*;
 
-public class UseCase extends UseCaseComponent {
+public class UseCase extends UMLComponent {
     int width;
     int height;
 
@@ -33,5 +35,10 @@ public class UseCase extends UseCaseComponent {
         int x = (width  - metrics.stringWidth(name)) / 2;
         int y = ((height - metrics.getHeight()) / 2) + metrics.getAscent();
         g2.drawString(name, x, y);
+    }
+
+    @Override
+    public void draw(Graphics g) {
+
     }
 }

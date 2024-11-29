@@ -1,9 +1,11 @@
 package BusinessLayer.Components.UseCaseDiagramComponents;
 
+import BusinessLayer.Components.UMLComponent;
+
 import java.awt.*;
 import java.util.ArrayList;
 
-public class Actor extends UseCaseComponent {
+public class Actor extends UMLComponent {
     ArrayList<UseCase> useCases; //use cases connected to this actor
 
     public Actor(String name){
@@ -52,5 +54,34 @@ public class Actor extends UseCaseComponent {
         int textX = (getWidth() - metrics.stringWidth(name)) / 2;
         int textY = legStartY + legLength + 15; // Position text below legs
         g2d.drawString(this.name, textX, textY);
+
+        if(isSelected()){
+            // Save the current stroke
+            Stroke originalStroke = g2d.getStroke();
+
+            // Create a dashed stroke
+            float[] dashPattern = {5.0f, 5.0f}; // Dash and gap lengths
+            g2d.setStroke(new BasicStroke(1.0f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND, 1.0f, dashPattern, 0.0f));
+
+            // Set a light color
+            g2d.setColor(new Color(173, 216, 230, 150)); // Light blue with some transparency
+
+            // Draw the dashed boundary
+            int margin = 10; // Space around the actor
+            g2d.drawRect(
+                    centerX - armLength - margin, // Left boundary
+                    20 - margin,                 // Top boundary
+                    armLength * 2 + margin * 2,  // Width
+                    legStartY + legLength + margin - 10 // Height
+            );
+
+            // Restore the original stroke
+            g2d.setStroke(originalStroke);
+        }
+    }
+
+    @Override
+    public void draw(Graphics g) {
+
     }
 }

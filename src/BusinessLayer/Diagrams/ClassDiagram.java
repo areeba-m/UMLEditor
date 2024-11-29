@@ -23,7 +23,7 @@ public class ClassDiagram extends UMLDiagram {
     public void renderComponents(Graphics g) {
 
     }
-
+/*
     @Override
     public void dragEnter(DropTargetDragEvent dtde) {
 
@@ -47,5 +47,5 @@ public class ClassDiagram extends UMLDiagram {
     @Override
     public void drop(DropTargetDropEvent dtde) {
 
-    }
+    }*/
 }

@@ -1,8 +1,9 @@
 package ui;
-
+import BusinessLayer.Components.UMLComponent;
 import BusinessLayer.Components.ClassDiagramComponents.ClassBox;
 import BusinessLayer.Components.UseCaseDiagramComponents.Actor;
 import BusinessLayer.Components.UseCaseDiagramComponents.UseCase;
+import BusinessLayer.Components.UseCaseDiagramComponents.UseCaseDiagramRelationship;
 import BusinessLayer.Diagrams.ClassDiagram;
 import BusinessLayer.Diagrams.UMLDiagram;
 import BusinessLayer.Diagrams.UseCaseDiagram;
@@ -11,6 +12,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 public class UMLEditorForm extends JFrame {
 
@@ -56,7 +59,8 @@ public class UMLEditorForm extends JFrame {
 
         setUIFont(new Font("Segoe UI Emoji", Font.PLAIN, 14));
 
-        prepareMenuBar();prepareDiagramType();
+        prepareMenuBar();
+        prepareDiagramType();
         prepareCanvas();
 
 
@@ -96,7 +100,7 @@ public class UMLEditorForm extends JFrame {
         // ree in
 
         //drawingCanvas = new DrawingCanvas();
-        workingDiagram = new UseCaseDiagram(panelGrid); // THIS SHOULD BE CLASS DIAGRAM BY DEFAULT
+        workingDiagram = new UseCaseDiagram(); // THIS SHOULD BE CLASS DIAGRAM BY DEFAULT
 
         //canvasScrollPane = new JScrollPane(drawingCanvas);
         canvasScrollPane = new JScrollPane(workingDiagram);
@@ -167,7 +171,6 @@ public class UMLEditorForm extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 String diagramType = (String) cmbDiagramType.getSelectedItem();
                 loadComponentsForSelectedDiagram(diagramType);
-
             }
         });
     }
@@ -179,14 +182,65 @@ public class UMLEditorForm extends JFrame {
 
             // Add more UML class components if needed
         } else if ("UML Use Case".equals(diagramType)) {
-            //panelGrid.add(new UseCase("Use Case"));
-            workingDiagram = new UseCaseDiagram(panelGrid);
+            if (!(workingDiagram instanceof UseCaseDiagram)) {
+                workingDiagram = new UseCaseDiagram();
+            }
 
-            // Add more UML use case components if needed
+            UseCaseDiagramRelationship includeRelationship = new UseCaseDiagramRelationship(null, null, "Include");
+            UseCaseDiagramRelationship excludeRelationship = new UseCaseDiagramRelationship(null, null, "Exclude");
+            UseCaseDiagramRelationship associationRelationship = new UseCaseDiagramRelationship(null, null, "Association");
+
+            UseCase sampleUsecase = new UseCase("UseCase");
+
+            Actor sampleActor = new Actor("Actor");
+
+            setupComponentForGrid(sampleUsecase);
+            setupComponentForGrid(sampleActor);
+            setupComponentForGrid(associationRelationship);
+            setupComponentForGrid(excludeRelationship);
+            setupComponentForGrid(includeRelationship);
+
+            panelGrid.add(sampleUsecase);
+            panelGrid.add(sampleActor);
+            panelGrid.add(associationRelationship);
+            panelGrid.add(includeRelationship);
+            panelGrid.add(excludeRelationship);
+
         }
 
         panelGrid.revalidate();
         panelGrid.repaint();
+    }
+
+    private void setupComponentForGrid(UMLComponent component) {
+        component.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+
+                try {
+                    /*UMLComponent newComponent = component.getClass()
+                            .getDeclaredConstructor(String.class)
+                            .newInstance(component.getName());*/
+
+                    UMLComponent newComponent = null;
+                    if (component instanceof Actor) {
+                        newComponent = new Actor(component.getName());
+                    }
+                    else if (component instanceof UseCase) {
+                        newComponent = new UseCase(component.getName());
+                    }
+                    else if (component instanceof UseCaseDiagramRelationship) {
+                        newComponent = new UseCaseDiagramRelationship(null,null,component.getName());
+                    }
+                    //workingDiagram.setupComponentForDiagram(newComponent); // Set drag listeners
+                    workingDiagram.addComponent(newComponent);
+
+                } catch (Exception ex) {
+                    System.out.println(ex.getMessage());
+                }
+
+            }
+        });
     }
 
     public static void main(String[] args){
