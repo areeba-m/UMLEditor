@@ -4,17 +4,15 @@ import BusinessLayer.Components.UMLComponent;
 
 import java.awt.*;
 import java.awt.event.MouseEvent;
+import java.util.ArrayList;
 
 public class UseCase extends UMLComponent {
-    int width;
-    int height;
+    private ArrayList<Actor> actors = new ArrayList<>();
 
     public UseCase(String name) {
         super();
         this.name = name;
         setPreferredSize(new Dimension(200,200));
-
-        this.point = new Point(0,0);
     }
 
     @Override
@@ -57,15 +55,18 @@ public class UseCase extends UMLComponent {
         g2.drawString(name, textX, textY);
 
         // Draw dashed boundary if selected
-        if (isSelected()) {
-            float[] dashPattern = {5, 5}; // Dashed line pattern
-            g2.setStroke(new BasicStroke(1, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 10, dashPattern, 0));
-            g2.setColor(Color.BLUE);
 
-            // Dashed rectangle slightly larger than the oval
-            int rectPadding = 2; // Additional padding around the oval
+        float[] dashPattern = {5, 5}; // Dashed line pattern
+        g2.setStroke(new BasicStroke(1, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 10, dashPattern, 0));
+        g2.setColor(Color.BLUE);
+
+        // Dashed rectangle slightly larger than the oval
+        int rectPadding = 2; // Additional padding around the oval
+        if (isSelected()) {
             g2.drawRect(ovalX - rectPadding, ovalY - rectPadding, ovalWidth + rectPadding * 2, ovalHeight + rectPadding * 2);
         }
+        Point p = new Point(ovalX - rectPadding, ovalY - rectPadding);
+        setPoint(p);
     }
 
     public void handleUseCaseMousePressed(MouseEvent e){
@@ -83,5 +84,19 @@ public class UseCase extends UMLComponent {
     @Override
     public void draw(Graphics g) {
 
+    }
+
+    public void addActor(Actor actor) {
+        if (!actors.contains(actor)) {
+            actors.add(actor);
+            actor.addUseCase(this); // Bidirectional relationship
+        }
+    }
+
+    public void removeActor(Actor actor) {
+        if (actors.contains(actor)) {
+            actors.remove(actor);
+            actor.removeUseCase(this); // Bidirectional relationship
+        }
     }
 }

@@ -155,8 +155,38 @@ public class UMLEditorForm extends JFrame {
         panelComboBox.setLayout(new BoxLayout(panelComboBox, BoxLayout.Y_AXIS));
         panelComboBox.add(cmbDiagramType);
 
-        panelGrid = new JPanel(new GridLayout(0,2));
-        panelGrid.setPreferredSize(new Dimension(1000,1000));
+        panelGrid = new JPanel(null) {
+            @Override
+            protected void paintComponent(Graphics g) {
+                super.paintComponent(g); // Paint the default background (white)
+
+                // Set the background to white
+                g.setColor(Color.WHITE);
+                g.fillRect(0, 0, getWidth(), getHeight());
+
+                // Draw the dotted background
+                drawDottedBackground(g);
+            }
+
+            private void drawDottedBackground(Graphics g) {
+                Graphics2D g2d = (Graphics2D) g;
+
+                // Set the dot color to light gray
+                g2d.setColor(new Color(211, 211, 211)); // Light gray dots
+
+                // Define dot size and spacing
+                int dotSize = 2;       // Diameter of each dot (small-sized)
+                int dotSpacing = 15;   // Space between dots
+
+                // Draw dots at regular intervals
+                for (int x = 0; x < getWidth(); x += dotSpacing) {
+                    for (int y = 0; y < getHeight(); y += dotSpacing) {
+                        g2d.fillOval(x, y, dotSize, dotSize);
+                    }
+                }
+            }
+        };
+        panelGrid.setPreferredSize(new Dimension(500,500));
         panelGrid.setBackground(Color.gray);
 
         diagramTypeScrollPane = new JScrollPane(panelGrid);
@@ -231,23 +261,33 @@ public class UMLEditorForm extends JFrame {
             if (!(workingDiagram instanceof UseCaseDiagram)) {
                 workingDiagram = new UseCaseDiagram();
             }
+            UseCase uc1 = new UseCase("UseCase 1");
+            UseCase uc2 = new UseCase("UseCase 2");
+            UseCase uc3 = new UseCase("UseCase 3");
+            Actor actor = new Actor("Actor");
 
-            UseCaseDiagramRelationship includeRelationship = new UseCaseDiagramRelationship(null, null, "Include");
-            UseCaseDiagramRelationship excludeRelationship = new UseCaseDiagramRelationship(null, null, "Exclude");
-            UseCaseDiagramRelationship associationRelationship = new UseCaseDiagramRelationship(null, null, "Association");
+            actor.setBounds(10, 10, 50, 100);
+            uc1.setBounds(150, 10, 100, 50);
+            uc2.setBounds(250, 100, 100, 50);
+            uc3.setBounds(120, 180, 100, 50);
 
-            UseCase sampleUsecase = new UseCase("UseCase");
+            UseCaseDiagramRelationship includeRelationship = new UseCaseDiagramRelationship(uc3, uc2, "Include");
+            UseCaseDiagramRelationship excludeRelationship = new UseCaseDiagramRelationship(uc1, uc2, "Exclude");
+            UseCaseDiagramRelationship associationRelationship = new UseCaseDiagramRelationship(actor, uc1, "Association");
 
-            Actor sampleActor = new Actor("Actor");
+            includeRelationship.setManualBounds(new Point(125, 165), new Point(275, 365));
+            excludeRelationship.setManualBounds(new Point(125, 145), new Point(375, 345));
+            associationRelationship.setManualBounds(new Point(100, 50), new Point(150, 100));
 
-            setupComponentForGrid(sampleUsecase);
-            setupComponentForGrid(sampleActor);
-            setupComponentForGrid(associationRelationship);
-            setupComponentForGrid(excludeRelationship);
-            setupComponentForGrid(includeRelationship);
+            setupComponentForGrid(uc1);
+            setupComponentForGrid(uc2);
+            setupComponentForGrid(uc3);
+            setupComponentForGrid(actor);
 
-            panelGrid.add(sampleUsecase);
-            panelGrid.add(sampleActor);
+            panelGrid.add(uc1);
+            panelGrid.add(uc2);
+            panelGrid.add(uc3);
+            panelGrid.add(actor);
             panelGrid.add(associationRelationship);
             panelGrid.add(includeRelationship);
             panelGrid.add(excludeRelationship);
@@ -276,7 +316,7 @@ public class UMLEditorForm extends JFrame {
                         newComponent = new UseCase(component.getName());
                     }
                     else if (component instanceof UseCaseDiagramRelationship) {
-                        newComponent = new UseCaseDiagramRelationship(null,null,component.getName());
+                       // newComponent = new UseCaseDiagramRelationship(null,null,component.getName());
                     }
                     //workingDiagram.setupComponentForDiagram(newComponent); // Set drag listeners
                     component.setSelected(false); // panel grid component should not show as selected

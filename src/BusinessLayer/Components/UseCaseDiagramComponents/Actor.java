@@ -93,6 +93,8 @@ public class Actor extends UMLComponent {
                     rectHeight                    // Height
             );
 
+            Point p = new Point((figureWidth - rectWidth) / 2, margin / 2);
+            setPoint(p);
             // Restore the original stroke
             g2d.setStroke(originalStroke);
         }
@@ -101,5 +103,19 @@ public class Actor extends UMLComponent {
     @Override
     public void draw(Graphics g) {
 
+    }
+
+    public void addUseCase(UseCase useCase) {
+        if (!useCases.contains(useCase)) {
+            useCases.add(useCase);
+            useCase.addActor(this); // Bidirectional relationship
+        }
+    }
+
+    public void removeUseCase(UseCase useCase) {
+        if (useCases.contains(useCase)) {
+            useCases.remove(useCase);
+            useCase.removeActor(this); // Bidirectional relationship
+        }
     }
 }
