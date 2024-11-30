@@ -4,13 +4,16 @@ import BusinessLayer.Components.UMLComponent;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.ArrayList;
 import java.awt.dnd.DropTargetListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.util.ArrayList;
 
-public abstract class UMLDiagram extends JPanel {
+public abstract class UMLDiagram extends JPanel{
     String name;
+
+    protected UMLComponent selectedComponent; // Track the currently selected component
+    protected Point offset; // Offset between the mouse and the top-left corner of the component
     public static ArrayList<UMLComponent> components;
 
     public UMLDiagram(){
@@ -23,6 +26,11 @@ public abstract class UMLDiagram extends JPanel {
     public abstract void removeComponent(UMLComponent component);
     public abstract void renderComponents(Graphics g);//draws all components on the canvas
 
+    public static ArrayList<UMLComponent> getComponentList()
+    {
+        return components;
+    }
+
     public void setupComponentForDiagram(UMLComponent component) {
         component.addMouseMotionListener(new MouseAdapter() {
             Point prevPoint;
@@ -30,7 +38,7 @@ public abstract class UMLDiagram extends JPanel {
             @Override
             public void mousePressed(MouseEvent e) {
                 prevPoint = e.getPoint();
-
+                System.out.print("Mouse pressed in UML Diagram:" + prevPoint);
             }
 
             @Override
@@ -49,8 +57,18 @@ public abstract class UMLDiagram extends JPanel {
             @Override
             public void mouseReleased(MouseEvent e) {
                 component.getParent().repaint();
+                //System.out.println(component.getParent());
             }
         });
+    }
+
+    public UMLComponent getComponentAt(int i)
+    {
+        return components.get(i);
+    }
+    public int getComponentsCount()
+    {
+        return components.size();
     }
 
     public ArrayList<UMLComponent> getComponentArr() {
@@ -91,4 +109,5 @@ public abstract class UMLDiagram extends JPanel {
             g2d.drawLine(0, y, getWidth(), y);
         }
     }
+
 }
