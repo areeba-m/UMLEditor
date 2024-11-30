@@ -1,6 +1,7 @@
 package BusinessLayer.Components.ClassDiagramComponents;
 
 import BusinessLayer.Components.UMLComponent;
+import BusinessLayer.Diagrams.UMLDiagram;
 
 import java.awt.*;
 import java.awt.geom.Path2D;
@@ -13,6 +14,7 @@ public class Inheritence extends UMLComponent {
 
     public Inheritence(Point p1, Point p2)
     {
+        super();
         point = new Point();
         endPoint = new Point();
         point.setLocation(p1.getX(), p1.getY());
@@ -71,6 +73,11 @@ public class Inheritence extends UMLComponent {
     public ArrayList<ClassBox> getChild()
     {
         return null;
+    }
+
+    @Override
+    public void updateFromTextArea() {
+
     }
 
     public void draw(Graphics g){
