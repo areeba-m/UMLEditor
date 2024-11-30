@@ -1,7 +1,7 @@
 package BusinessLayer.Components.ClassDiagramComponents;
 
 import BusinessLayer.Components.UMLComponent;
-import BusinessLayer.Components.UseCaseDiagramComponents.UseCase;
+
 
 import javax.swing.*;
 import java.awt.*;
