@@ -56,13 +56,13 @@ public class UseCaseDiagramRelationship extends UMLComponent {
         int y2 = endPoint.y;
 
         // Draw the line
-        if (name.equalsIgnoreCase("Association")) {
-            // Solid line for associations
-            g2d.setStroke(new BasicStroke(2));
-        } else {
-            // Dashed line for include/exclude
-            float[] dashPattern = {10, 10}; // Dash length
+        if (name.equalsIgnoreCase("Include") ||
+                name.equalsIgnoreCase("Exclude")) {
+            float[] dashPattern = {10, 10};
             g2d.setStroke(new BasicStroke(2, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 10, dashPattern, 0));
+
+        } else {
+            g2d.setStroke(new BasicStroke(2));
         }
         g2d.drawLine(x1, y1, x2, y2);
 
@@ -82,6 +82,26 @@ public class UseCaseDiagramRelationship extends UMLComponent {
             g2d.setColor(Color.RED);
             g2d.fillOval(startPoint.x - 5, startPoint.y - 5, 10, 10); // Circle around the start point
             g2d.fillOval(endPoint.x - 5, endPoint.y - 5, 10, 10);     // Circle around the end point
+        }
+
+        if(isDraggingStart() || isDraggingEnd()){
+            // Calculate the bounding rectangle of the line
+            int x = Math.min(x1, x2) - 5; // Add some padding for better visibility
+            int y = Math.min(y1, y2) - 5;
+            int width = Math.abs(x2 - x1) + 10; // Add padding
+            int height = Math.abs(y2 - y1) + 10;
+
+            // Set color to blue
+            g2d.setColor(Color.BLUE);
+
+            // Set dashed stroke
+            float[] dashPattern = {5, 5}; // Shorter dash for rectangle
+            g2d.setStroke(new BasicStroke(1, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 10, dashPattern, 0));
+
+            // Draw the dashed rectangle
+            g2d.drawRect(x, y, width, height);
+
+            revalidate(); // Notify the layout manager
         }
     }
 
@@ -103,24 +123,6 @@ public class UseCaseDiagramRelationship extends UMLComponent {
         g2d.setStroke(new BasicStroke(1));
         g2d.drawLine(x2, y2, xArrow1, yArrow1);
         g2d.drawLine(x2, y2, xArrow2, yArrow2);
-    }
-
-    private void updateBounds() {
-        // Calculate the bounding box for the arrow
-        int x = Math.min(startPoint.x, endPoint.x);
-        int y = Math.min(startPoint.y, endPoint.y);
-        int width = Math.abs(startPoint.x - endPoint.x);
-        int height = Math.abs(startPoint.y - endPoint.y);
-
-        // Update the component's bounds
-        setBounds(x - 10, y - 10, width + 20, height + 20); // Add padding for arrowhead
-
-        // Adjust startPoint and endPoint relative to the new bounds
-        startPoint = new Point(startPoint.x - getX(), startPoint.y - getY());
-        endPoint = new Point(endPoint.x - getX(), endPoint.y - getY());
-
-        revalidate();
-        repaint();
     }
 
     private boolean isNearStartPoint(MouseEvent e) {
@@ -155,7 +157,16 @@ public class UseCaseDiagramRelationship extends UMLComponent {
             endPoint = e.getPoint();
             repaint();
         }
-        //updateBounds();
+
+        int minX = Math.min(startPoint.x, endPoint.x) - 10; // Add some padding
+        int minY = Math.min(startPoint.y, endPoint.y) - 10;
+        int width = Math.abs(endPoint.x - startPoint.x) + 20; // Add padding
+        int height = Math.abs(endPoint.y - startPoint.y) + 20;
+
+        startPoint = new Point(startPoint.x - minX, startPoint.y - minY);
+        endPoint = new Point(endPoint.x - minX, endPoint.y - minY);
+
+        setBounds(minX, minY, width, height);
     }
 
     // Optional: Getters and setters for start and end points
@@ -196,5 +207,13 @@ public class UseCaseDiagramRelationship extends UMLComponent {
     @Override
     public void draw(Graphics g) {
 
+    }
+
+    public boolean isDraggingStart() {
+        return draggingStart;
+    }
+
+    public boolean isDraggingEnd() {
+        return draggingEnd;
     }
 }

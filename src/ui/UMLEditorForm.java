@@ -14,6 +14,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.ArrayList;
 
 public class UMLEditorForm extends JFrame {
 
@@ -32,7 +33,6 @@ public class UMLEditorForm extends JFrame {
 
     // canvas components
     // ree comes in
-    //DrawingCanvas drawingCanvas;
     UMLDiagram workingDiagram;
     // ree goes
 
@@ -47,10 +47,11 @@ public class UMLEditorForm extends JFrame {
     JScrollPane diagramTypeScrollPane;
 
     // text area components
-    JTextArea textArea;
+    static JTextArea textArea;
     JScrollPane textAreaScrollPane;
     JPanel panelBottomEast;
 
+    JButton btnUpdate;
     public UMLEditorForm(){
 
         setTitle("UML Editor Application");
@@ -63,8 +64,46 @@ public class UMLEditorForm extends JFrame {
         prepareDiagramType();
         prepareCanvas();
 
-
         loadGrid();
+
+        btnUpdate.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                ArrayList<UMLComponent> components = workingDiagram.getComponentArr();
+                for(UMLComponent component: components){
+                    if(component.isSelected()) {
+                        component.repaint();
+                    }
+                }
+            }
+        });
+
+        textArea.getDocument().addDocumentListener(new javax.swing.event.DocumentListener() {
+            @Override
+            public void insertUpdate(javax.swing.event.DocumentEvent e) {
+                updateComponentName();
+            }
+
+            @Override
+            public void removeUpdate(javax.swing.event.DocumentEvent e) {
+                updateComponentName();
+            }
+
+            @Override
+            public void changedUpdate(javax.swing.event.DocumentEvent e) {
+                updateComponentName();
+            }
+
+            private void updateComponentName() {
+                ArrayList<UMLComponent> components = workingDiagram.getComponentArr();
+
+                for (UMLComponent component : components) {
+                    if (component.isSelected()) {
+                        component.setName(textArea.getText());
+                    }
+                }
+            }
+        });
 
         pack();
     }
@@ -99,10 +138,8 @@ public class UMLEditorForm extends JFrame {
     private void prepareCanvas(){
         // ree in
 
-        //drawingCanvas = new DrawingCanvas();
         workingDiagram = new UseCaseDiagram(); // THIS SHOULD BE CLASS DIAGRAM BY DEFAULT
 
-        //canvasScrollPane = new JScrollPane(drawingCanvas);
         canvasScrollPane = new JScrollPane(workingDiagram);
         canvasScrollPane.setPreferredSize(new Dimension(800,600));
 
@@ -136,12 +173,21 @@ public class UMLEditorForm extends JFrame {
         textArea.setText("Add diagram notes");
         textArea.setPreferredSize(new Dimension(500,500));
 
+        btnUpdate = new JButton("↻ Update");
+
         textAreaScrollPane = new JScrollPane(textArea);
+
+        JPanel panelForUpdateButton = new JPanel();
+        panelForUpdateButton.setLayout(new BoxLayout(panelForUpdateButton, BoxLayout.X_AXIS));
+        panelForUpdateButton.add(Box.createHorizontalGlue());
+        panelForUpdateButton.add(btnUpdate);
+        panelForUpdateButton.add(Box.createHorizontalStrut(10));
 
         panelBottomEast = new JPanel();
         panelBottomEast.setPreferredSize(new Dimension(400,300));
         panelBottomEast.setLayout(new BoxLayout(panelBottomEast, BoxLayout.Y_AXIS));
         panelBottomEast.add(textAreaScrollPane);
+        panelBottomEast.add(panelForUpdateButton);
 
         // combine panels
         panelEast = new JPanel();
@@ -233,6 +279,7 @@ public class UMLEditorForm extends JFrame {
                         newComponent = new UseCaseDiagramRelationship(null,null,component.getName());
                     }
                     //workingDiagram.setupComponentForDiagram(newComponent); // Set drag listeners
+                    component.setSelected(false); // panel grid component should not show as selected
                     workingDiagram.addComponent(newComponent);
 
                 } catch (Exception ex) {
@@ -241,6 +288,10 @@ public class UMLEditorForm extends JFrame {
 
             }
         });
+    }
+
+    public static JTextArea getTextArea(){
+        return textArea;
     }
 
     public static void main(String[] args){

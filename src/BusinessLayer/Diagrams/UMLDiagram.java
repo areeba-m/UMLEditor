@@ -11,7 +11,7 @@ import java.util.ArrayList;
 
 public abstract class UMLDiagram extends JPanel {
     String name;
-    ArrayList<UMLComponent> components;
+    public static ArrayList<UMLComponent> components;
 
     public abstract void addComponent(UMLComponent component);
     public abstract void removeComponent(UMLComponent component);
@@ -24,6 +24,7 @@ public abstract class UMLDiagram extends JPanel {
             @Override
             public void mousePressed(MouseEvent e) {
                 prevPoint = e.getPoint();
+
             }
 
             @Override
@@ -46,5 +47,7 @@ public abstract class UMLDiagram extends JPanel {
         });
     }
 
-
+    public ArrayList<UMLComponent> getComponentArr() {
+        return components;
+    }
 }

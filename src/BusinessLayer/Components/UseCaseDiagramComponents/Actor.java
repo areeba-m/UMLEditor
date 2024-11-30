@@ -22,57 +22,75 @@ public class Actor extends UMLComponent {
         super.paintComponent(g);
         Graphics2D g2d = (Graphics2D) g;
 
-        // Enable antialiasing for smoother graphics
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-        // Calculate dimensions
-        int centerX = getWidth() / 2;
-        int headRadius = 10; // Head is a small circle
-        int bodyHeight = 40; // Height of the body
-        int armLength = 20;  // Length of the arms
-        int legLength = 30;  // Length of the legs
+        int headRadius = 10;   // Radius of the head
+        int bodyHeight = 40;   // Height of the body
+        int armLength = 20;    // Length of the arms
+        int legLength = 30;    // Length of the legs
 
-        // Stick figure components
-        // 1. Head (circle)
+        // Add margins around the stick figure
+        int margin = 20;
+
+        // Get FontMetrics to calculate text dimensions
+        FontMetrics metrics = g2d.getFontMetrics(g2d.getFont());
+        int textWidth = metrics.stringWidth(name); // Width of the name text
+        int textHeight = metrics.getHeight();      // Height of the name text
+
+        // Calculate dimensions of the figure
+        int figureWidth = Math.max(2 * armLength + margin * 2, textWidth + margin); // Ensure the width accommodates the name
+        int figureHeight = 2 * headRadius + bodyHeight + legLength + textHeight + margin + 5;
+
+        // Set the preferred size based on the calculated dimensions
+        setPreferredSize(new Dimension(figureWidth, figureHeight));
+        setSize(figureWidth, figureHeight);
+
+        // Center coordinates for the stick figure
+        int centerX = figureWidth / 2;
+        int headY = margin; // Y-coordinate of the head's top
+
+        // Draw the stick figure
         g2d.setColor(Color.BLACK);
-        g2d.drawOval(centerX - headRadius, 10, 2 * headRadius, 2 * headRadius);
 
-        // 2. Body (vertical line)
-        int bodyStartY = 10 + 2 * headRadius;
+        // 1. Head
+        g2d.drawOval(centerX - headRadius, headY, 2 * headRadius, 2 * headRadius);
+
+        // 2. Body
+        int bodyStartY = headY + 2 * headRadius;
         g2d.drawLine(centerX, bodyStartY, centerX, bodyStartY + bodyHeight);
 
-        // 3. Arms (two horizontal lines)
-        g2d.drawLine(centerX - armLength, bodyStartY + 10, centerX + armLength, bodyStartY + 10);
+        // 3. Arms
+        int armY = bodyStartY + 10;
+        g2d.drawLine(centerX - armLength, armY, centerX + armLength, armY);
 
-        // 4. Legs (two diagonal lines)
+        // 4. Legs
         int legStartY = bodyStartY + bodyHeight;
         g2d.drawLine(centerX, legStartY, centerX - armLength, legStartY + legLength); // Left leg
         g2d.drawLine(centerX, legStartY, centerX + armLength, legStartY + legLength); // Right leg
 
-        // Optional: Add "Actor" text below the figure
-        FontMetrics metrics = g.getFontMetrics(g.getFont());
-        int textX = (getWidth() - metrics.stringWidth(name)) / 2;
-        int textY = legStartY + legLength + 15; // Position text below legs
-        g2d.drawString(this.name, textX, textY);
+        // Draw the actor's name below the figure
+        int textX = (figureWidth - textWidth) / 2; // Center the text horizontally
+        int textY = legStartY + legLength + textHeight; // Position text below legs
+        g2d.drawString(name, textX, textY);
 
-        if(isSelected()){
+        // If selected, draw a dashed rectangle around the figure and name
+        if (isSelected()) {
             // Save the current stroke
             Stroke originalStroke = g2d.getStroke();
 
-            // Create a dashed stroke
-            float[] dashPattern = {5.0f, 5.0f}; // Dash and gap lengths
+            // Dashed line pattern
+            float[] dashPattern = {5.0f, 5.0f};
             g2d.setStroke(new BasicStroke(1.0f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND, 1.0f, dashPattern, 0.0f));
+            g2d.setColor(Color.BLUE);
 
-            // Set a light color
-            g2d.setColor(new Color(173, 216, 230, 150)); // Light blue with some transparency
-
-            // Draw the dashed boundary
-            int margin = 10; // Space around the actor
+            // Draw a dashed boundary rectangle
+            int rectWidth = Math.max(2 * armLength + margin, textWidth + margin); // Ensure it encloses the name
+            int rectHeight = figureHeight - margin / 2 - 2; // Ensure bottom line is below the name
             g2d.drawRect(
-                    centerX - armLength - margin, // Left boundary
-                    20 - margin,                 // Top boundary
-                    armLength * 2 + margin * 2,  // Width
-                    legStartY + legLength + margin - 10 // Height
+                    (figureWidth - rectWidth) / 2, // X-coordinate to center the rectangle
+                    margin / 2,                   // Y-coordinate
+                    rectWidth,                    // Width
+                    rectHeight                    // Height
             );
 
             // Restore the original stroke

@@ -23,29 +23,4 @@ public class ClassDiagram extends UMLDiagram {
     public void renderComponents(Graphics g) {
 
     }
-/*
-    @Override
-    public void dragEnter(DropTargetDragEvent dtde) {
-
-    }
-
-    @Override
-    public void dragOver(DropTargetDragEvent dtde) {
-
-    }
-
-    @Override
-    public void dropActionChanged(DropTargetDragEvent dtde) {
-
-    }
-
-    @Override
-    public void dragExit(DropTargetEvent dte) {
-
-    }
-
-    @Override
-    public void drop(DropTargetDropEvent dtde) {
-
-    }*/
 }
