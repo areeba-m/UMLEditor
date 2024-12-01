@@ -33,14 +33,6 @@ public class UseCaseDiagram extends UMLDiagram {
         components.add(component);
         setupComponentForDiagram(component);
 
-        // Add click listener to detect connections
-        component.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                handleComponentClick(component);
-            }
-        });
-
         add(component);
         component.setBounds(50, 50, component.getPreferredSize().width, component.getPreferredSize().height);
         revalidate();
@@ -66,11 +58,9 @@ public class UseCaseDiagram extends UMLDiagram {
         JFrame frame = new JFrame("Diagram");
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         frame.setSize(300, 300);
-        //frame.setVisible(true);
         frame.setLocationRelativeTo(null);
 
         ConnectionDialog dialog = new ConnectionDialog(frame, "UseCase");
-
 
         if(dialog.getOptionSelected().equalsIgnoreCase("Association")) {
             UseCaseDiagramRelationship relationship = new UseCaseDiagramRelationship(comp1, comp2, "Association");

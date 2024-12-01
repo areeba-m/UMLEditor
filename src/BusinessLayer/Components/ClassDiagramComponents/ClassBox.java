@@ -35,6 +35,7 @@ public class ClassBox extends UMLComponent {
 
     @Override
     public void updateFromTextArea() {
+        //String[] sections = textArea.getText().split("\n----------------------------------------\n");
         String[] sections = textArea.getText().split("\n--\n");
 
         String[] attributes = new String[0];
@@ -110,7 +111,7 @@ public class ClassBox extends UMLComponent {
 
     public void handleClassBoxMousePressed(MouseEvent e)
     {
-        //setSelected(true);
+        /*//setSelected(true);
         String text = name;
         text += "\n";
         //starting attributes
@@ -134,7 +135,16 @@ public class ClassBox extends UMLComponent {
         {
             text += methods.get(i);
             text += "\n";
+        }*/
+        String text = name.concat("\n--\n");
+        for(String attribute:attributes){
+            text = text.concat(attribute + "\n");
         }
+        text = text.concat("--\n");
+        for(String method:methods){
+            text = text.concat(method + "\n");
+        }
+        System.out.println("Text: " + text);
         textArea.removeAll();
         textArea.setText(text);
 

@@ -52,11 +52,13 @@ public class UMLEditorForm extends JFrame {
 
     JScrollPane textAreaScrollPane;
     JPanel panelBottomEast;
-    // grid components
-    JPanel umlClassPanel;
-    JPanel umlUseCasePanel;
 
     JButton btnUpdate;
+
+    // new feature in ui
+    public static boolean isConnectMode;
+    private SwitchButton switchButton;
+
     public UMLEditorForm(){
 
         setTitle("UML Editor Application");
@@ -138,9 +140,24 @@ public class UMLEditorForm extends JFrame {
         generateCodeFiles = new JMenuItem("⚙\uFE0F Generate Code Files");
         codeMenu.add(generateCodeFiles);
 
+        isConnectMode = false;
+        switchButton = new SwitchButton();
+        switchButton.setCustomToolTipText("Connect Mode");
+
+        switchButton.addActionListener(e -> {
+            isConnectMode = switchButton.isOn();
+            switchButton.setCustomToolTipText("Connect Mode: " + switchButton.getState());
+
+        });
+
+        JPanel switchPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+        switchPanel.setOpaque(false);
+        switchPanel.add(switchButton);
+
         menuBar.add(fileMenu);
         menuBar.add(exportMenu);
         menuBar.add(codeMenu);
+        menuBar.add(switchPanel);
 
         setJMenuBar(menuBar);
     }
@@ -149,7 +166,6 @@ public class UMLEditorForm extends JFrame {
         workingDiagram = diagram;//new UseCaseDiagram();
         if(canvasScrollPane != null){
             this.remove(canvasScrollPane);
-
         }
         canvasScrollPane = new JScrollPane(workingDiagram);
         canvasScrollPane.setPreferredSize(new Dimension(800,600));
@@ -438,6 +454,7 @@ public class UMLEditorForm extends JFrame {
         UMLEditorForm app = new UMLEditorForm();
         app.setVisible(true);
     }
+
     public void setSelectedClassBox(ClassBox classBox) {
         selectedClassBox = classBox;
 

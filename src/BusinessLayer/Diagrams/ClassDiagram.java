@@ -39,15 +39,6 @@ public class ClassDiagram extends UMLDiagram {
         setupComponentForDiagram(component);
         add(component);
 
-        // Add click listener to detect connections
-        component.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                handleComponentClick(component);
-            }
-        });
-
-
         component.setBounds(50, 50, component.getPreferredSize().width, component.getPreferredSize().height);
         revalidate();
         repaint();

@@ -1,6 +1,7 @@
 package BusinessLayer.Diagrams;
 
 import BusinessLayer.Components.UMLComponent;
+import ui.PopupMenu;
 
 import javax.swing.*;
 import java.awt.*;
@@ -9,11 +10,14 @@ import java.awt.dnd.DropTargetListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
+import static ui.UMLEditorForm.isConnectMode;
+
 public abstract class UMLDiagram extends JPanel{
     String name;
 
     private UMLComponent selectedComponent1 = null;
     private UMLComponent selectedComponent2 = null;
+    private PopupMenu popupMenu;
 
    public static ArrayList<UMLComponent> components;
 
@@ -21,6 +25,7 @@ public abstract class UMLDiagram extends JPanel{
         setLayout(null);
         setPreferredSize(new Dimension(1000,1000));
 
+        popupMenu = new PopupMenu(this);
     }
 
     public abstract void addComponent(UMLComponent component);
@@ -34,11 +39,10 @@ public abstract class UMLDiagram extends JPanel{
             @Override
             public void mousePressed(MouseEvent e) {
                 prevPoint = e.getPoint();
-                for (UMLComponent component : components) {
-                    component.setSelected(false);
+                if (!popupMenu.isVisible()) {
+                    return;
                 }
-
-                System.out.print("Mouse pressed in UML Diagram:" + prevPoint);
+                popupMenu.setVisible(false);
             }
 
             @Override
@@ -57,9 +61,29 @@ public abstract class UMLDiagram extends JPanel{
             @Override
             public void mouseReleased(MouseEvent e) {
                 component.getParent().repaint();
-                //System.out.println(component.getParent());
             }
+
+            @Override
+            public void mousePressed(MouseEvent e) {
+
+            }
+
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if (SwingUtilities.isRightMouseButton(e)) {
+                    if (component.isSelected()) {
+                        int width = (component.getBounds().width)/2;
+                        int height = component.getBounds().height;
+                        popupMenu.show(UMLDiagram.this, component.getX() + width, component.getY()+height);
+                    }
+                }
+
+                if(isConnectMode)
+                    handleComponentClick(component);
+            }
+
         });
+
     }
 
     public UMLComponent getComponentAt(int i)
@@ -77,17 +101,19 @@ public abstract class UMLDiagram extends JPanel{
 
     @Override
     protected void paintComponent(Graphics g) {
-        super.paintComponent(g); // Call the parent method to ensure proper panel rendering
+        super.paintComponent(g);
 
-        drawGrid(g); // Custom method to draw the dotted grid
+        Graphics2D g2d = (Graphics2D) g;
+        Stroke originalStroke = g2d.getStroke();
+        drawGrid(g2d);
+        g2d.setStroke(originalStroke);
 
         // Call renderComponents to draw the components after the grid
         //renderComponents(g);
     }
 
     // Method to draw a light-colored dotted grid
-    private void drawGrid(Graphics g) {
-        Graphics2D g2d = (Graphics2D) g;
+    private void drawGrid(Graphics2D g2d) {
 
         // Set the grid color (light gray)
         g2d.setColor(new Color(200, 200, 200));
@@ -128,5 +154,15 @@ public abstract class UMLDiagram extends JPanel{
         }
     }
     protected abstract void createConnection(UMLComponent comp1, UMLComponent comp2);
+
+    public UMLComponent getSelectedComponent() {
+        for (UMLComponent component : components) {
+            if (component.isSelected()) {
+                return component;
+            }
+        }
+        return null;
+    }
+
 
 }

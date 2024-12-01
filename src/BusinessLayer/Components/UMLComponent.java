@@ -44,15 +44,19 @@ public abstract class UMLComponent extends JComponent {
                     component.setSelected(false);
                 }
                 if (UMLComponent.this.contains(e.getPoint())) {
-                    UMLComponent.this.setSelected(true); // Select only this component
+                    UMLComponent.this.setSelected(true);
+
                 }
 
                 if(UMLComponent.this instanceof ClassBox obj) {
                     obj.handleClassBoxMousePressed(e);
                 }
+                else{
+                    // class box specifically sets its own text
+                    textArea.setText(getName());
+                    textArea.requestFocus();
+                }
 
-                textArea.setText(getName());
-                textArea.requestFocus();
             }
 
             @Override
@@ -110,7 +114,7 @@ public abstract class UMLComponent extends JComponent {
     }
     public void SetTextArea(String text)
     {
-        this.textArea.setText(text);
+        textArea.setText(text);
     }
     public String getType()
     {
