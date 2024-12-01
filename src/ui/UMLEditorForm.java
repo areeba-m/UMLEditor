@@ -14,6 +14,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.*;
+import java.io.File;
 import java.util.ArrayList;
 
 public class UMLEditorForm extends JFrame {
@@ -144,15 +145,21 @@ public class UMLEditorForm extends JFrame {
         switchButton = new SwitchButton();
         switchButton.setCustomToolTipText("Connect Mode");
 
+        JPanel switchPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+        switchPanel.setOpaque(false);
+        switchPanel.add(switchButton);
+
         switchButton.addActionListener(e -> {
             isConnectMode = switchButton.isOn();
             switchButton.setCustomToolTipText("Connect Mode: " + switchButton.getState());
 
         });
-
-        JPanel switchPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
-        switchPanel.setOpaque(false);
-        switchPanel.add(switchButton);
+        generateCodeFiles.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                chooseDirectory(e);
+            }
+        });
 
         menuBar.add(fileMenu);
         menuBar.add(exportMenu);
@@ -186,27 +193,21 @@ public class UMLEditorForm extends JFrame {
         panelGrid = new JPanel(null) {
             @Override
             protected void paintComponent(Graphics g) {
-                super.paintComponent(g); // Paint the default background (white)
+                super.paintComponent(g);
 
-                // Set the background to white
                 g.setColor(Color.WHITE);
                 g.fillRect(0, 0, getWidth(), getHeight());
 
-                // Draw the dotted background
                 drawDottedBackground(g);
             }
 
             private void drawDottedBackground(Graphics g) {
                 Graphics2D g2d = (Graphics2D) g;
+                g2d.setColor(new Color(211, 211, 211));
 
-                // Set the dot color to light gray
-                g2d.setColor(new Color(211, 211, 211)); // Light gray dots
-
-                // Define dot size and spacing
                 int dotSize = 2;       // Diameter of each dot (small-sized)
                 int dotSpacing = 15;   // Space between dots
 
-                // Draw dots at regular intervals
                 for (int x = 0; x < getWidth(); x += dotSpacing) {
                     for (int y = 0; y < getHeight(); y += dotSpacing) {
                         g2d.fillOval(x, y, dotSize, dotSize);
@@ -388,11 +389,11 @@ public class UMLEditorForm extends JFrame {
             uc3.setBounds(120, 180, 100, 50);
 
             UseCaseDiagramRelationship includeRelationship = new UseCaseDiagramRelationship(uc3, uc2, "Include");
-            UseCaseDiagramRelationship excludeRelationship = new UseCaseDiagramRelationship(uc1, uc2, "Exclude");
+            UseCaseDiagramRelationship extendRelationship = new UseCaseDiagramRelationship(uc1, uc2, "extend");
             UseCaseDiagramRelationship associationRelationship = new UseCaseDiagramRelationship(actor, uc1, "Association");
 
             includeRelationship.setManualBounds(new Point(125, 165), new Point(275, 365));
-            excludeRelationship.setManualBounds(new Point(125, 145), new Point(375, 345));
+            extendRelationship.setManualBounds(new Point(125, 145), new Point(375, 345));
             associationRelationship.setManualBounds(new Point(100, 50), new Point(150, 100));
 
             setupComponentForGrid(uc1);
@@ -406,7 +407,7 @@ public class UMLEditorForm extends JFrame {
             panelGrid.add(actor);
             panelGrid.add(associationRelationship);
             panelGrid.add(includeRelationship);
-            panelGrid.add(excludeRelationship);
+            panelGrid.add(extendRelationship);
         }
 
         panelGrid.revalidate();
@@ -462,5 +463,28 @@ public class UMLEditorForm extends JFrame {
     public static JTextArea getTextArea()
     {
         return textArea;
+    }
+
+    public void chooseDirectory(ActionEvent e){
+        JFileChooser directoryChooser = new JFileChooser();
+        directoryChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+        directoryChooser.setDialogTitle("Select Directory to Generate Code Files");
+
+        int userSelection = directoryChooser.showOpenDialog(null);
+
+        if (userSelection == JFileChooser.APPROVE_OPTION) {
+            File selectedDirectory = directoryChooser.getSelectedFile();
+
+            // Perform your code generation logic here
+            //workingDiagram.generate code or something
+
+            System.out.println("Selected Directory: " + selectedDirectory.getAbsolutePath());
+            JOptionPane.showMessageDialog(null,
+                    "Code files will be generated in: " + selectedDirectory.getAbsolutePath(),
+                    "Directory Selected",
+                    JOptionPane.INFORMATION_MESSAGE);
+        } else {
+            System.out.println("Directory selection was cancelled.");
+        }
     }
 }

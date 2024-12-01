@@ -1,6 +1,7 @@
 package BusinessLayer.Components.UseCaseDiagramComponents;
 
 import BusinessLayer.Components.UMLComponent;
+import BusinessLayer.Diagrams.UseCaseDiagram;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -28,8 +29,8 @@ public class UseCaseDiagramRelationship extends UMLComponent {
 
         if (name.equalsIgnoreCase("Include")) {
             this.label = "<<include>>";
-        } else if (name.equalsIgnoreCase("Exclude")) {
-            this.label = "<<exclude>>";
+        } else if (name.equalsIgnoreCase("Extend")) {
+            this.label = "<<Extend>>";
         } else {
             this.label = ""; // No label for simple associations
         }
@@ -60,7 +61,7 @@ public class UseCaseDiagramRelationship extends UMLComponent {
 
         // Draw the line
         if (name.equalsIgnoreCase("Include") ||
-                name.equalsIgnoreCase("Exclude")) {
+                name.equalsIgnoreCase("Extend")) {
             float[] dashPattern = {10, 10};
             g2d.setStroke(new BasicStroke(2, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 10, dashPattern, 0));
 
@@ -118,7 +119,7 @@ public class UseCaseDiagramRelationship extends UMLComponent {
         int y2 = endPoint.y - getY();
 
         // Set the stroke based on the relationship type
-        if (name.equalsIgnoreCase("Include") || name.equalsIgnoreCase("Exclude")) {
+        if (name.equalsIgnoreCase("Include") || name.equalsIgnoreCase("Extend")) {
             float[] dashPattern = {10, 10};
             g2d.setStroke(new BasicStroke(2, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 10, dashPattern, 0));
         } else {
@@ -277,6 +278,14 @@ public class UseCaseDiagramRelationship extends UMLComponent {
 
         // Attach listeners to update bounds when 'from' or 'to' move
         if (from != null && to != null) {
+
+            if(from instanceof Actor && to instanceof UseCase){
+                ((Actor) from).addUseCase((UseCase) to); // this will add actor in use case too
+            } else if(from instanceof UseCase && to instanceof Actor){
+                ((UseCase) from).addActor((Actor) to);
+            } // if its two use cases we don't gaf
+
+
             from.addComponentListener(new ComponentAdapter() {
                 @Override
                 public void componentMoved(ComponentEvent e) {
@@ -317,13 +326,13 @@ public class UseCaseDiagramRelationship extends UMLComponent {
         System.out.println("Painting line from " + startPoint + " to " + endPoint);
 
         if (name.equalsIgnoreCase("Include") ||
-                name.equalsIgnoreCase("Exclude")) {
+                name.equalsIgnoreCase("Extend")) {
 
             float[] dashPattern = {10, 10};
             g2d.setStroke(new BasicStroke(2, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 10, dashPattern, 0));
 
             this.label = name.equalsIgnoreCase("Include") ? "<<include>>" :
-                    name.equalsIgnoreCase("Exclude") ? "<<exclude>>" : "";
+                    name.equalsIgnoreCase("Extend") ? "<<Extend>>" : "";
         } else {
             g2d.setStroke(new BasicStroke(2));
         }

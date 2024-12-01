@@ -104,4 +104,5 @@ public class UseCase extends UMLComponent {
             actor.removeUseCase(this); // Bidirectional relationship
         }
     }
+
 }

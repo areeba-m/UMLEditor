@@ -1,5 +1,6 @@
 package BusinessLayer.Diagrams;
 
+import BusinessLayer.Components.ClassDiagramComponents.ClassBox;
 import BusinessLayer.Components.ClassDiagramComponents.ClassDiagramRelationship;
 import BusinessLayer.Components.UMLComponent;
 import BusinessLayer.Components.UseCaseDiagramComponents.UseCaseDiagramRelationship;
@@ -47,6 +48,28 @@ public class ClassDiagram extends UMLDiagram {
     @Override
     public void removeComponent(UMLComponent component) {
         if (components.contains(component)) { // Remove only if present
+
+            if(component instanceof ClassBox componentToRemove){ // safely deleting
+
+                for(ClassDiagramRelationship relationship: componentToRemove.getRelationships()){
+
+                    if(relationship.getTo() instanceof ClassBox otherClass && otherClass != componentToRemove){
+                        // if 'to' is this class, don't delete relationship yet
+                        otherClass.removeRelationship(relationship); // relationship was added to two classes, delete from other class first
+                        components.remove(relationship); // remove from array
+                        remove(relationship); // remove from diagram
+                    }
+                    else if(relationship.getFrom() instanceof ClassBox otherClass && otherClass != componentToRemove){
+                        otherClass.removeRelationship(relationship);
+                        components.remove(relationship);
+                        remove(relationship);
+                    }
+                }
+
+            } else if(component instanceof  ClassDiagramRelationship obj){
+                obj.removeFromAndTo();
+            }
+
             components.remove(component);
             remove(component);
             revalidate();

@@ -33,6 +33,12 @@ public class ClassDiagramRelationship extends UMLComponent{
 
         // Attach listeners to update bounds when 'from' or 'to' move
         if (from != null && to != null) {
+
+            if(from instanceof ClassBox && to instanceof ClassBox) {
+                ((ClassBox) from).addRelationship(this);
+                ((ClassBox) to).addRelationship(this);
+            }
+
             from.addComponentListener(new ComponentAdapter() {
                 @Override
                 public void componentMoved(ComponentEvent e) {
@@ -202,4 +208,18 @@ public class ClassDiagramRelationship extends UMLComponent{
         setBounds(x, y, width, height);
     }
 
+    public UMLComponent getFrom() {
+        return from;
+    }
+
+    public UMLComponent getTo() {
+        return to;
+    }
+
+    public void removeFromAndTo(){
+        ((ClassBox)to).removeRelationship(this);
+        ((ClassBox)from).removeRelationship(this);
+        revalidate();
+        repaint();
+    }
 }

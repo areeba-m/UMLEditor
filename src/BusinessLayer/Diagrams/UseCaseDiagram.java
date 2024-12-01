@@ -72,12 +72,12 @@ public class UseCaseDiagram extends UMLDiagram {
 
             UseCaseDiagramRelationship relationship = new UseCaseDiagramRelationship(comp1, comp2, "Include");
             addComponent(relationship);
-        } else if(dialog.getOptionSelected().equalsIgnoreCase("Exclude")) {
+        } else if(dialog.getOptionSelected().equalsIgnoreCase("Extend")) {
             if(comp1 instanceof Actor || comp2 instanceof Actor){
                 //throw exception;
             }
 
-            UseCaseDiagramRelationship relationship = new UseCaseDiagramRelationship(comp1, comp2, "Exclude");
+            UseCaseDiagramRelationship relationship = new UseCaseDiagramRelationship(comp1, comp2, "Extend");
             addComponent(relationship);
         }
 

@@ -1,6 +1,7 @@
 package BusinessLayer.Components.ClassDiagramComponents;
 
 import BusinessLayer.Components.UMLComponent;
+import BusinessLayer.Components.UseCaseDiagramComponents.UseCase;
 import ui.UMLEditorForm;
 
 import java.awt.*;
@@ -10,6 +11,8 @@ import java.util.ArrayList;
 public class ClassBox extends UMLComponent {
     ArrayList<String> attributes;
     ArrayList<String> methods;
+    ArrayList<ClassDiagramRelationship> relationships;
+
     int height;
     int width;
     //String classType; shifted to UMLComponent
@@ -22,6 +25,7 @@ public class ClassBox extends UMLComponent {
         this.classType = "";
         this.attributes = new ArrayList<>();
         this.methods = new ArrayList<>();
+        this.relationships = new ArrayList<>();
 
         this.height = 60;
         this.width = 100;
@@ -405,6 +409,19 @@ public class ClassBox extends UMLComponent {
         repaint();    // Request a repaint for the updated size
     }
 
+    public void addRelationship(ClassDiagramRelationship relationship) {
+        if (!relationships.contains(relationship)) {
+            relationships.add(relationship);
+        }
+    }
+
+    public void removeRelationship(ClassDiagramRelationship relationship) {
+        relationships.remove(relationship);
+    }
+
+    public ArrayList<ClassDiagramRelationship> getRelationships() {
+        return relationships;
+    }
 }
 /*
 public class ClassBox extends UMLComponent {
