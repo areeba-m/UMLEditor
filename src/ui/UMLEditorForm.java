@@ -67,7 +67,8 @@ public class UMLEditorForm extends JFrame {
 
         prepareMenuBar();
         prepareDiagramType();
-        prepareCanvas();
+        UMLDiagram diagram = new ClassDiagram();
+        prepareCanvas(diagram);
         loadGrid();
 
         btnUpdate.addActionListener(new ActionListener() {
@@ -106,7 +107,8 @@ public class UMLEditorForm extends JFrame {
                 ArrayList<UMLComponent> components = workingDiagram.getComponentArr();
 
                 for (UMLComponent component : components) {
-                    if (component.isSelected()) {
+                    if (!(component instanceof ClassBox || component instanceof ClassDiagramRelationship)
+                            && component.isSelected()) {
                         component.setName(textArea.getText());
                     }
                 }
@@ -143,13 +145,18 @@ public class UMLEditorForm extends JFrame {
         setJMenuBar(menuBar);
     }
 
-    private void prepareCanvas(){
-        workingDiagram = new ClassDiagram();
+    private void prepareCanvas(UMLDiagram diagram){
+        workingDiagram = diagram;//new UseCaseDiagram();
+        if(canvasScrollPane != null){
+            this.remove(canvasScrollPane);
+
+        }
         canvasScrollPane = new JScrollPane(workingDiagram);
         canvasScrollPane.setPreferredSize(new Dimension(800,600));
-
+        System.out.println("New working diagram added to scroll pane");
         add(canvasScrollPane, BorderLayout.CENTER);
-
+        revalidate();
+        repaint();
     }
 
     private void prepareDiagramType(){
@@ -261,7 +268,7 @@ public class UMLEditorForm extends JFrame {
         if ("UML Class".equals(diagramType))
         {
             if(!(workingDiagram instanceof ClassDiagram)) {
-                workingDiagram = new ClassDiagram();
+                prepareCanvas(new ClassDiagram());
             }
             int startX = 10;
             int startY = 10;
@@ -276,12 +283,20 @@ public class UMLEditorForm extends JFrame {
             simpleClass.setIsGridPanel(true);
             simpleClass.setSelected(false);
 
+            ClassBox concreteClass = new ClassBox();
+            concreteClass.setName("ConcreteClass");
+            concreteClass.setType("simple");
+            concreteClass.getPoint().setLocation(startX, startY);
+            concreteClass.setIsGridPanel(true);
+            concreteClass.setSelected(false);
+
             ClassBox abstractClass = new ClassBox();
             abstractClass.setName("AbstractClass");
             abstractClass.setType("Abstract");
             abstractClass.getPoint().setLocation(startX + offsetX, startY);
             abstractClass.setIsGridPanel(true);
             abstractClass.setSelected(false);
+
             ClassBox interfaceClass = new ClassBox();
             interfaceClass.setName("Class");
             interfaceClass.setType("Interface");
@@ -289,68 +304,63 @@ public class UMLEditorForm extends JFrame {
             interfaceClass.setIsGridPanel(true);
             interfaceClass.setSelected(false);
 
-            // Create relationship lines beneath the AbstractClass
-            int relationshipStartX = abstractClass.getPoint().x + offsetX / 2;
-            int relationshipStartY = abstractClass.getPoint().y + 50; // Below the abstract class
-
             // Define and draw relationships
             ClassDiagramRelationship association = new ClassDiagramRelationship(
-                    new Point(relationshipStartX, relationshipStartY+5), // Start at AbstractClass
-                    new Point(relationshipStartX + 100, relationshipStartY+5) // End at some point (adjust as needed)
+                    simpleClass,
+                    abstractClass,
+                    "association"
             );
-            association.setType("association");
             association.setSelected(false);
             association.setIsGridPanel(true);
 
             ClassDiagramRelationship aggregation = new ClassDiagramRelationship(
-                    new Point(relationshipStartX, relationshipStartY + 20), // Start below the association line
-                    new Point(relationshipStartX + 100, relationshipStartY + 20) // End at some point
+                    abstractClass,
+                    simpleClass,
+                    "aggregation"
             );
-            aggregation.setType("aggregation");
             aggregation.setSelected(false);
             aggregation.setIsGridPanel(true);
 
             ClassDiagramRelationship composition = new ClassDiagramRelationship(
-                    new Point(relationshipStartX, relationshipStartY + 35), // Start below the aggregation line
-                    new Point(relationshipStartX + 100, relationshipStartY + 35) // End at some point
+                    interfaceClass,
+                    simpleClass,
+                    "composition"
             );
-            composition.setType("composition");
             composition.setSelected(false);
             composition.setIsGridPanel(true);
 
             ClassDiagramRelationship inheritance = new ClassDiagramRelationship(
-                    new Point(relationshipStartX, relationshipStartY + 50), // Start below the composition line
-                    new Point(relationshipStartX + 100, relationshipStartY + 50) // End at some point
+                    abstractClass,
+                    concreteClass,
+                    "inheritance"
             );
-            inheritance.setType("inheritence");
             inheritance.setSelected(false);
             inheritance.setIsGridPanel(true);
+
+            simpleClass.setBounds(10, 10, 200, 200);
+            abstractClass.setBounds(200, 10, 200, 200);
+            interfaceClass.setBounds(10, 150, 200, 200);
+            concreteClass.setBounds(200, 150, 200, 200);
 
             setupComponentForGrid(simpleClass);
             setupComponentForGrid(abstractClass);
             setupComponentForGrid(interfaceClass);
-            setupComponentForGrid(inheritance);
-            setupComponentForGrid(association);
-            setupComponentForGrid(composition);
-            setupComponentForGrid(aggregation);
+            setupComponentForGrid(concreteClass);
 
-            // Add boxes to the panel
             panelGrid.add(simpleClass);
             panelGrid.add(abstractClass);
             panelGrid.add(interfaceClass);
-
-            // Add the relationships to the panel (they will be drawn by their paintComponent method)
+            panelGrid.add(concreteClass);
             panelGrid.add(inheritance);
             panelGrid.add(association);
             panelGrid.add(aggregation);
             panelGrid.add(composition);
 
-
-            // Add more UML class components if needed
         } else if ("UML Use Case".equals(diagramType)) {
             if (!(workingDiagram instanceof UseCaseDiagram)) {
-                workingDiagram = new UseCaseDiagram();
+                prepareCanvas(new UseCaseDiagram());
             }
+
             UseCase uc1 = new UseCase("UseCase 1");
             UseCase uc2 = new UseCase("UseCase 2");
             UseCase uc3 = new UseCase("UseCase 3");
@@ -393,10 +403,6 @@ public class UMLEditorForm extends JFrame {
             public void mouseClicked(MouseEvent e) {
 
                 try {
-                    /*UMLComponent newComponent = component.getClass()
-                            .getDeclaredConstructor(String.class)
-                            .newInstance(component.getName());*/
-
                     UMLComponent newComponent = null;
                     if (component instanceof ClassBox) {
                         newComponent = new ClassBox();
@@ -407,8 +413,8 @@ public class UMLEditorForm extends JFrame {
                     }
                     else if(component instanceof ClassDiagramRelationship)
                     {
-                        Point end = new Point((int) (e.getPoint().getX() + 30), (int) (e.getPoint().getY()+0));
-                        newComponent = new ClassDiagramRelationship(e.getPoint(), end);
+                        //Point end = new Point((int) (e.getPoint().getX() + 30), (int) (e.getPoint().getY()+0));
+                        //newComponent = new ClassDiagramRelationship(e.getPoint(), end);
                     } else if (component instanceof Actor) {
                         newComponent = new Actor(component.getName());
                     } else if (component instanceof UseCase) {

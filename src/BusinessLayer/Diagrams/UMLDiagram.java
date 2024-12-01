@@ -12,24 +12,20 @@ import java.awt.event.MouseEvent;
 public abstract class UMLDiagram extends JPanel{
     String name;
 
-    protected UMLComponent selectedComponent; // Track the currently selected component
-    protected Point offset; // Offset between the mouse and the top-left corner of the component
-    public static ArrayList<UMLComponent> components;
+    private UMLComponent selectedComponent1 = null;
+    private UMLComponent selectedComponent2 = null;
+
+   public static ArrayList<UMLComponent> components;
 
     public UMLDiagram(){
         setLayout(null);
         setPreferredSize(new Dimension(1000,1000));
-        //setBackground(Color.PINK);
+
     }
 
     public abstract void addComponent(UMLComponent component);
     public abstract void removeComponent(UMLComponent component);
     public abstract void renderComponents(Graphics g);//draws all components on the canvas
-
-    public static ArrayList<UMLComponent> getComponentList()
-    {
-        return components;
-    }
 
     public void setupComponentForDiagram(UMLComponent component) {
         component.addMouseMotionListener(new MouseAdapter() {
@@ -38,6 +34,10 @@ public abstract class UMLDiagram extends JPanel{
             @Override
             public void mousePressed(MouseEvent e) {
                 prevPoint = e.getPoint();
+                for (UMLComponent component : components) {
+                    component.setSelected(false);
+                }
+
                 System.out.print("Mouse pressed in UML Diagram:" + prevPoint);
             }
 
@@ -71,7 +71,7 @@ public abstract class UMLDiagram extends JPanel{
         return components.size();
     }
 
-    public ArrayList<UMLComponent> getComponentArr() {
+    public static ArrayList<UMLComponent> getComponentArr() {
         return components;
     }
 
@@ -109,5 +109,24 @@ public abstract class UMLDiagram extends JPanel{
             g2d.drawLine(0, y, getWidth(), y);
         }
     }
+
+    protected void handleComponentClick(UMLComponent component) {
+        if (selectedComponent1 == null) {
+            selectedComponent1 = component; // First component selected
+            System.out.println("Selected first component: " + selectedComponent1.getName());
+
+        } else if (selectedComponent2 == null) {
+            selectedComponent2 = component; // Second component selected
+            System.out.println("Selected second component: " + selectedComponent2.getName());
+
+            // Create a connection
+            createConnection(selectedComponent1, selectedComponent2);
+
+            // Reset selection
+            selectedComponent1 = null;
+            selectedComponent2 = null;
+        }
+    }
+    protected abstract void createConnection(UMLComponent comp1, UMLComponent comp2);
 
 }

@@ -5,28 +5,19 @@ import BusinessLayer.Components.UseCaseDiagramComponents.Actor;
 import BusinessLayer.Components.UseCaseDiagramComponents.UseCase;
 import BusinessLayer.Components.UseCaseDiagramComponents.UseCaseComponent;
 import BusinessLayer.Components.UseCaseDiagramComponents.UseCaseDiagramRelationship;
+import ui.ConnectionDialog;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.datatransfer.DataFlavor;
-import java.awt.dnd.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 
-import static ui.ConnectionDialog.createRoundedDialog;
-
 public class UseCaseDiagram extends UMLDiagram {
-
-    private UMLComponent selectedComponent1 = null;
-    private UMLComponent selectedComponent2 = null;
 
     public UseCaseDiagram(){
         super();
         components = new ArrayList<>();
-        //setLayout(null);
-        //setPreferredSize(new Dimension(1000,1000));
-        //setBackground(Color.PINK);
 
     }
 
@@ -69,31 +60,36 @@ public class UseCaseDiagram extends UMLDiagram {
 
     }
 
-    private void handleComponentClick(UMLComponent component) {
-        if (selectedComponent1 == null) {
-            selectedComponent1 = component; // First component selected
-            System.out.println("Selected first component: " + selectedComponent1.getName());
+    @Override
+    protected void createConnection(UMLComponent comp1, UMLComponent comp2) {
 
-        } else if (selectedComponent2 == null) {
-            selectedComponent2 = component; // Second component selected
-            System.out.println("Selected second component: " + selectedComponent2.getName());
+        JFrame frame = new JFrame("Diagram");
+        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        frame.setSize(300, 300);
+        //frame.setVisible(true);
+        frame.setLocationRelativeTo(null);
 
-            // Create a connection
-            createConnection(selectedComponent1, selectedComponent2);
+        ConnectionDialog dialog = new ConnectionDialog(frame, "UseCase");
 
-            // Reset selection
-            selectedComponent1 = null;
-            selectedComponent2 = null;
+
+        if(dialog.getOptionSelected().equalsIgnoreCase("Association")) {
+            UseCaseDiagramRelationship relationship = new UseCaseDiagramRelationship(comp1, comp2, "Association");
+            addComponent(relationship);
+        } else if(dialog.getOptionSelected().equalsIgnoreCase("Include")) {
+            if(comp1 instanceof Actor || comp2 instanceof Actor){
+                //throw exception;
+            }
+
+            UseCaseDiagramRelationship relationship = new UseCaseDiagramRelationship(comp1, comp2, "Include");
+            addComponent(relationship);
+        } else if(dialog.getOptionSelected().equalsIgnoreCase("Exclude")) {
+            if(comp1 instanceof Actor || comp2 instanceof Actor){
+                //throw exception;
+            }
+
+            UseCaseDiagramRelationship relationship = new UseCaseDiagramRelationship(comp1, comp2, "Exclude");
+            addComponent(relationship);
         }
-    }
-
-    private void createConnection(UMLComponent comp1, UMLComponent comp2) {
-
-        createRoundedDialog();
-
-        UseCaseDiagramRelationship relationship = new UseCaseDiagramRelationship(comp1, comp2, "Include");
-
-        addComponent(relationship);
 
         revalidate();
         repaint();

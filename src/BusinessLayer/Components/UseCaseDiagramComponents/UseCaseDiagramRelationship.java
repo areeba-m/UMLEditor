@@ -367,18 +367,6 @@ public class UseCaseDiagramRelationship extends UMLComponent {
         g2d.drawLine(x2, y2 , xArrow2, yArrow2);
     }
 
-    /*private Point calculateConnectionPoint(UMLComponent component) {
-        if (component == null) {
-            return null;
-        }
-
-        Rectangle bounds = component.getBounds();
-        Point center = new Point(bounds.x + bounds.width / 2, bounds.y + bounds.height / 2);
-
-        // Transform center point relative to this component's bounds
-        return new Point(center.x - getX(), center.y - getY());
-    }*/
-
     private Point calculateConnectionPoint(UMLComponent component, UMLComponent otherComponent) {
         if (component == null || otherComponent == null) {
             return null;
@@ -435,6 +423,11 @@ public class UseCaseDiagramRelationship extends UMLComponent {
 
         // Update this component's bounds
         setBounds(x, y, width, height);
+    }
+
+    @Override
+    public void updateFromTextArea() {
+
     }
 
     @Override

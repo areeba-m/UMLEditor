@@ -5,128 +5,63 @@ import BusinessLayer.Components.UMLComponent;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Path2D;
 import java.util.ArrayList;
 
 public class ClassDiagramRelationship extends UMLComponent{
-    ClassBox classA;
-    ClassBox classB;
 
-    String type;//types: 1)association, composition, aggregation
-
+    Point centerPoint;
     Point endPoint;
 
-    boolean resizingStart = false;
-    boolean resizingEnd = false;
-    boolean rotating = false; // For tracking rotation state
-    Point dragStartPoint;
-    Point centerPoint;
+    private UMLComponent from;
+    private UMLComponent to;
 
     //for inheritance only
     ClassBox parent;
     ArrayList<ClassBox> child;
 
-    public ClassDiagramRelationship(Point p1, Point p2)
+    public ClassDiagramRelationship(UMLComponent from, UMLComponent to, String name)
     {
         super();
+        this.from = from;
+        this.to = to;
+        this.name = name;
 
-        setPreferredSize(new Dimension(100, 100));
-        point = new Point();
-        endPoint = new Point();
-        point.setLocation(p1.getX(), p1.getY());
-        endPoint.setLocation(p2.getX(), p2.getY());
-        isGridPanel = false;
-        centerPoint = new Point((point.x + endPoint.x) / 2, (point.y + endPoint.y) / 2); // Initial midpoint
-
-        addMouseListener(new MouseAdapter() {
-            @Override
-            public void mousePressed(MouseEvent e) {
-                if (isNearResizeArea(e.getPoint(), point)) {
-                    resizingStart = true;
-                    dragStartPoint = e.getPoint();
-                } else if (isNearResizeArea(e.getPoint(), endPoint)) {
-                    resizingEnd = true;
-                    dragStartPoint = e.getPoint();
-                } else if (isNearRotateArea(e.getPoint())) {
-                    rotating = true;
-                    dragStartPoint = e.getPoint();
-                }
-            }
-
-            @Override
-            public void mouseReleased(MouseEvent e) {
-                resizingStart = false;
-                resizingEnd = false;
-                rotating = false;
-            }
-        });
-
-        addMouseMotionListener(new MouseAdapter() {
-            @Override
-            public void mouseDragged(MouseEvent e) {
-                if (resizingStart) {
-                    int deltaX = e.getX() - dragStartPoint.x;
-                    int deltaY = e.getY() - dragStartPoint.y;
-                    point.translate(deltaX, deltaY);
-                    dragStartPoint = e.getPoint();
-                    repaint();
-                } else if (resizingEnd) {
-                    int deltaX = e.getX() - dragStartPoint.x;
-                    int deltaY = e.getY() - dragStartPoint.y;
-                    endPoint.translate(deltaX, deltaY);
-                    dragStartPoint = e.getPoint();
-                    repaint();
-                } else if (rotating) {
-                    // Calculate the angle difference for rotation
-                    double angle = Math.atan2(e.getY() - centerPoint.y, e.getX() - centerPoint.x) -
-                            Math.atan2(dragStartPoint.y - centerPoint.y, dragStartPoint.x - centerPoint.x);
-                    rotateLine(angle);
-                    dragStartPoint = e.getPoint();
+        // Attach listeners to update bounds when 'from' or 'to' move
+        if (from != null && to != null) {
+            from.addComponentListener(new ComponentAdapter() {
+                @Override
+                public void componentMoved(ComponentEvent e) {
+                    updateBounds();
                     repaint();
                 }
-            }
-        });
-    }
+            });
 
-    private boolean isNearResizeArea(Point mousePoint, Point linePoint) {
-        int tolerance = 10; // Define the range near the point where resizing can happen
-        return Math.abs(mousePoint.x - linePoint.x) <= tolerance && Math.abs(mousePoint.y - linePoint.y) <= tolerance;
-    }
+            to.addComponentListener(new ComponentAdapter() {
+                @Override
+                public void componentMoved(ComponentEvent e) {
+                    updateBounds();
+                    repaint();
+                }
+            });
 
-    private boolean isNearRotateArea(Point mousePoint) {
-        int tolerance = 15; // Define the range around the center point where rotation can happen
-        return Math.abs(mousePoint.x - centerPoint.x) <= tolerance && Math.abs(mousePoint.y - centerPoint.y) <= tolerance;
-    }
-
-    private void rotateLine(double angle) {
-        // Rotate both points around the center point
-        point = rotatePointAround(centerPoint.x, centerPoint.y, point, angle);
-        endPoint = rotatePointAround(centerPoint.x, centerPoint.y, endPoint, angle);
-        repaint();
-    }
-
-    private Point rotatePointAround(int centerX, int centerY, Point p, double angle) {
-        // Translate point to origin (pivot at center)
-        double x = p.x - centerX;
-        double y = p.y - centerY;
-
-        // Rotate the point around the origin
-        double newX = x * Math.cos(angle) - y * Math.sin(angle);
-        double newY = x * Math.sin(angle) + y * Math.cos(angle);
-
-        // Translate back
-        return new Point((int) (newX + centerX), (int) (newY + centerY));
-    }
-
-    public void setType(String type)
-    {
-        this.type = type;
+            // **Force initial bounds calculation**
+            updateBounds();
+            repaint(); // Ensure the component is drawn immediately
+        }
     }
 
     @Override
     public void updateFromTextArea() {
+
+    }
+
+    @Override
+    public void draw(Graphics g) {
 
     }
 
@@ -140,17 +75,27 @@ public class ClassDiagramRelationship extends UMLComponent{
         g2d.setStroke(new BasicStroke(2));
 
         // Draw the main line
+        point = calculateConnectionPoint(from, to);
+        endPoint = calculateConnectionPoint(to, from);
+
         g2d.drawLine(point.x, point.y, endPoint.x, endPoint.y);
 
         // Draw the relationship-specific symbols at the end
-        if (type.equals("aggregation")) {
-            drawHollowDiamond(g2d, endPoint.x+8, endPoint.y);
-        } else if (type.equals("composition")) {
-            drawFilledDiamond(g2d, endPoint.x+8, endPoint.y);
-        }else if (type.equals("inheritence")) {
-            drawUnfilledTriangle(g2d, endPoint.x+13, endPoint.y);
+        if (name.equalsIgnoreCase("aggregation")) {
+            drawHollowDiamond(g2d, endPoint.x + 8, endPoint.y);
+        } else if (name.equalsIgnoreCase("composition")) {
+            drawFilledDiamond(g2d, endPoint.x + 8, endPoint.y);
+        } else if (name.equalsIgnoreCase("inheritance")) {
+            drawUnfilledTriangle(g2d, endPoint.x + 13, endPoint.y);
+        }
+
+        if (isSelected()) {
+            g2d.setColor(Color.BLUE);
+            g2d.fillOval(point.x - 5, point.y - 5, 10, 10);
+            g2d.fillOval(endPoint.x - 5, endPoint.y - 5, 10, 10);
         }
     }
+
 
     // Method to draw a hollow diamond (aggregation)
     private void drawHollowDiamond(Graphics2D g2d, int x, int y) {
@@ -178,18 +123,6 @@ public class ClassDiagramRelationship extends UMLComponent{
         g2d.fill(diamond);  // Filled diamond
     }
 
-    // Method to draw an unfilled diamond (inheritance)
-    private void drawUnfilledDiamond(Graphics2D g2d, int x, int y) {
-        int size = 10;
-        Path2D.Double diamond = new Path2D.Double();
-        diamond.moveTo(x, y - size); // top
-        diamond.lineTo(x + size, y); // right
-        diamond.lineTo(x, y + size); // bottom
-        diamond.lineTo(x - size, y); // left
-        diamond.closePath();
-        g2d.setColor(Color.BLACK);
-        g2d.draw(diamond);  // Unfilled diamond (just outline)
-    }
     private void drawUnfilledTriangle(Graphics2D g2d, int x, int y) {
         int size = 15; // Increased the size of the triangle
         double angle = Math.atan2(point.y - y, point.x - x); // Angle of the line
@@ -211,8 +144,62 @@ public class ClassDiagramRelationship extends UMLComponent{
         g2d.draw(triangle);  // Outline of triangle
     }
 
-    @Override
-    public void draw(Graphics g) {
+    private Point calculateConnectionPoint(UMLComponent component, UMLComponent otherComponent) {
+        if (component == null || otherComponent == null) {
+            return null;
+        }
 
+        Rectangle bounds = component.getBounds();
+        Rectangle otherBounds = otherComponent.getBounds();
+
+        // Center of this component
+        int centerX = bounds.x + bounds.width / 2;
+        int centerY = bounds.y + bounds.height / 2;
+
+        // Center of the other component
+        int otherCenterX = otherBounds.x + otherBounds.width / 2;
+        int otherCenterY = otherBounds.y + otherBounds.height / 2;
+
+        // Direction vector from this component's center to the other component's center
+        double dx = otherCenterX - centerX;
+        double dy = otherCenterY - centerY;
+
+        // Find the intersection of the line with the bounds
+        double scaleX = dx == 0 ? Double.MAX_VALUE : (dx > 0 ? bounds.width / 2.0 : -bounds.width / 2.0) / dx;
+        double scaleY = dy == 0 ? Double.MAX_VALUE : (dy > 0 ? bounds.height / 2.0 : -bounds.height / 2.0) / dy;
+        double scale = Math.min(scaleX, scaleY);
+
+        // Calculate the intersection point
+        int edgeX = (int) (centerX + scale * dx);
+        int edgeY = (int) (centerY + scale * dy);
+
+        // Transform the point relative to this component's bounds
+        return new Point(edgeX - getX(), edgeY - getY());
     }
+
+    private void updateBounds() {
+        if (from == null || to == null) {
+            int x = Math.min(point.x, endPoint.x) - 10; // Add padding for x
+            int y = Math.min(point.y, endPoint.y) - 10; // Add padding for y
+            int width = Math.abs(endPoint.x - point.x) + 20; // Add padding for width
+            int height = Math.abs(endPoint.y - point.y) + 20; // Add padding for height
+
+            setBounds(10, 10, width, height);
+            System.out.println("default bounds: " + getBounds());
+            return;
+        }
+
+        Rectangle fromBounds = from.getBounds();
+        Rectangle toBounds = to.getBounds();
+
+        // Calculate the smallest bounding box containing both components
+        int x = Math.min(fromBounds.x, toBounds.x);
+        int y = Math.min(fromBounds.y, toBounds.y);
+        int width = Math.max(fromBounds.x + fromBounds.width, toBounds.x + toBounds.width) - x;
+        int height = Math.max(fromBounds.y + fromBounds.height, toBounds.y + toBounds.height) - y;
+
+        // Update this component's bounds
+        setBounds(x, y, width, height);
+    }
+
 }

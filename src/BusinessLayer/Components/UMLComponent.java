@@ -1,5 +1,6 @@
 package BusinessLayer.Components;
 
+import BusinessLayer.Components.ClassDiagramComponents.ClassDiagramRelationship;
 import BusinessLayer.Components.UseCaseDiagramComponents.UseCaseDiagramRelationship;
 import ui.UMLEditorForm;
 
@@ -9,13 +10,16 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.util.*;
+import java.util.ArrayList;
 
 import static BusinessLayer.Diagrams.UMLDiagram.components;
+import static BusinessLayer.Diagrams.UMLDiagram.getComponentArr;
+
+
 public abstract class UMLComponent extends JComponent {
     protected String name;
     protected Point point;
-    protected String classType;//i made this for class diagram
+    protected String classType;// I made this for class diagram
 
     protected Point dragOffset;
     private boolean isSelected = false;
@@ -36,15 +40,14 @@ public abstract class UMLComponent extends JComponent {
 
                 dragOffset = e.getPoint();
 
-                for (UMLComponent component : components) {
+                for (UMLComponent component :components) {
                     component.setSelected(false);
                 }
                 if (UMLComponent.this.contains(e.getPoint())) {
                     UMLComponent.this.setSelected(true); // Select only this component
                 }
 
-                if(UMLComponent.this instanceof ClassBox) {
-                    ClassBox obj = (ClassBox) UMLComponent.this;
+                if(UMLComponent.this instanceof ClassBox obj) {
                     obj.handleClassBoxMousePressed(e);
                 }
 
@@ -70,9 +73,8 @@ public abstract class UMLComponent extends JComponent {
                     }
                 }
 
-                if(UMLComponent.this instanceof ClassBox){
-                    ClassBox obj = (ClassBox) UMLComponent.this;
-                    obj.handleClassBoxMouseReleased(e);
+                if(UMLComponent.this instanceof ClassBox obj){
+                    //obj.handleClassBoxMouseReleased(e);
                 }
 
             }
@@ -82,12 +84,12 @@ public abstract class UMLComponent extends JComponent {
             @Override
             public void mouseDragged(MouseEvent e) {
 
-                if(UMLComponent.this instanceof  UseCaseDiagramRelationship){
+                if(UMLComponent.this instanceof  UseCaseDiagramRelationship ||
+                        UMLComponent.this instanceof ClassDiagramRelationship){
                     return;
                 }
 
-                if(UMLComponent.this instanceof ClassBox) {
-                    ClassBox obj = (ClassBox) UMLComponent.this;
+                if(UMLComponent.this instanceof ClassBox obj) {
                     obj.handleClassBoxMouseDragged(e);
                 }
 
@@ -118,6 +120,16 @@ public abstract class UMLComponent extends JComponent {
     public void setType(String type)
     {
         classType = type;
+
+        if (classType.equalsIgnoreCase("simple")){
+            setPreferredSize(new Dimension(120, 100));
+        } else if (classType.equalsIgnoreCase("abstract")){
+            setPreferredSize(new Dimension(120, 100));
+        } else if (classType.equalsIgnoreCase("interface")){
+            setPreferredSize(new Dimension(120, 150));
+        }
+        revalidate();
+        repaint();
     }
 
     public void setIsDropped(boolean flag)
@@ -139,10 +151,6 @@ public abstract class UMLComponent extends JComponent {
         repaint();
     }
 
-    public void setTextArea(JTextArea txtArea)
-    {
-        this.textArea = txtArea;
-    }
     public void setIsGridPanel(boolean flag)
     {
         this.isGridPanel = flag;

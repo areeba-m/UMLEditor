@@ -9,17 +9,12 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
 
-public class UseCaseComponent extends UMLComponent {
+public class UseCaseComponent {
 
     protected UMLComponent selectedComponent;
     protected Point dragOffset;
 
     public UseCaseComponent(){
-
-    }
-
-    @Override
-    public void draw(Graphics g) {
 
     }
 

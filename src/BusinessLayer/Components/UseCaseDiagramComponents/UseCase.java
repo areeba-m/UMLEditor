@@ -82,6 +82,11 @@ public class UseCase extends UMLComponent {
     }
 
     @Override
+    public void updateFromTextArea() {
+
+    }
+
+    @Override
     public void draw(Graphics g) {
 
     }
