@@ -9,6 +9,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Path2D;
 import java.util.ArrayList;
+import java.util.List;
 
 public class ClassDiagramRelationship extends UMLComponent{
     ClassBox classA;
@@ -213,6 +214,16 @@ public class ClassDiagramRelationship extends UMLComponent{
 
     @Override
     public void draw(Graphics g) {
+
+    }
+
+    @Override
+    public void setMethods(List<Object> methods) {
+
+    }
+
+    @Override
+    public void setAttributes(List<Object> attributes) {
 
     }
 }

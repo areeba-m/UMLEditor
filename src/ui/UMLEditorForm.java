@@ -10,6 +10,11 @@ import BusinessLayer.Diagrams.UMLDiagram;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.util.ArrayList;
 
 public class UMLEditorForm extends JFrame {
 
@@ -59,11 +64,13 @@ public class UMLEditorForm extends JFrame {
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
 
+        workingDiagram = new ClassDiagram();
+
         setUIFont(new Font("Segoe UI Emoji", Font.PLAIN, 14));
 
         prepareMenuBar();
         prepareDiagramType();
-        prepareCanvas();
+        prepareCanvas(workingDiagram);
         loadGrid();
         pack();
 
@@ -109,12 +116,88 @@ public class UMLEditorForm extends JFrame {
 
             }
         });
+        saveProject.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                JFileChooser fileChooser = new JFileChooser();
+                fileChooser.setDialogTitle("Save Project");
+                int userSelection = fileChooser.showSaveDialog(UMLEditorForm.this);
+
+                if (userSelection == JFileChooser.APPROVE_OPTION) {
+                    String fileName = fileChooser.getSelectedFile().toString();
+                    if (!fileName.endsWith(".json")) {
+                        fileName += ".json";
+                    }
+                    try {
+                        workingDiagram.saveToFile(fileName);
+                        JOptionPane.showMessageDialog(UMLEditorForm.this, "Project saved successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
+                    } catch (Exception ex) {
+                        JOptionPane.showMessageDialog(UMLEditorForm.this, "Failed to save the project: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                    }
+                }
+            }
+        });
+
+        loadProject.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                JFileChooser fileChooser = new JFileChooser();
+                fileChooser.setDialogTitle("Load Project");
+                int userSelection = fileChooser.showSaveDialog(UMLEditorForm.this);
+
+                if (userSelection == JFileChooser.APPROVE_OPTION) {
+                    String fileName = fileChooser.getSelectedFile().toString();
+                    if (!fileName.endsWith(".json")) {
+                        fileName += ".json";
+                    }
+                    try {
+                        UMLDiagram diagram = workingDiagram.loadFromFile(fileName);
+                        // Check if the loaded diagram is a ClassDiagram
+                        if (diagram instanceof ClassDiagram) {
+                            // If it is a ClassDiagram, populate workingDiagram
+                            workingDiagram = (ClassDiagram) diagram;
+                            String name = workingDiagram.getName();
+                            // Initialize the ClassBox components for the workingDiagram
+                            ArrayList<UMLComponent> components = workingDiagram.getListOfComponents();
+                            workingDiagram = new ClassDiagram();
+                            workingDiagram.setName(name);
+                            // Assuming UMLDiagram has a getComponents method
+                            for (UMLComponent component : components) {
+                                if (component instanceof ClassBox) {
+                                    ClassBox classBox = new ClassBox();
+                                    classBox.setName(component.getName());
+                                    classBox.setType(component.getType());
+                                    classBox.setHeight(component.getHeight());
+                                    classBox.setWidth(component.getWidth());
+                                    classBox.setAttributes(((ClassBox) component).getAttributes());
+                                    classBox.setMethods(((ClassBox) component).getMethods());
+                                    classBox.setSelected(false);
+                                    //workingDiagram.setupComponentForDiagram(classBox);
+                                    workingDiagram.addComponent(classBox);
+                                }
+                            }
+                            //loadComponentsForSelectedDiagram("UML Class");
+                            //canvasScrollPane.add(workingDiagram);
+                            // Redraw the diagram after loading
+                            //workingDiagram.repaint();
+                            prepareCanvas(workingDiagram);
+                            JOptionPane.showMessageDialog(UMLEditorForm.this, "Project loaded successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
+                        } else {
+                            JOptionPane.showMessageDialog(UMLEditorForm.this, "The loaded file is not a Class Diagram.", "Error", JOptionPane.ERROR_MESSAGE);
+                        }
+                    } catch (Exception ex) {
+                        JOptionPane.showMessageDialog(UMLEditorForm.this, "Failed to save the project: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                    }
+                }
+            }
+        });
+
     }
 
     private void updateUMLComponent() {
         for(int i = 0; i < workingDiagram.getComponentsCount(); i++)
         {
-            if(workingDiagram.getComponentAt(i).isSelected())
+             if(workingDiagram.getComponentAt(i).isSelected())
             {
                 workingDiagram.getComponentAt(i).updateFromTextArea();
                 workingDiagram.getComponentAt(i).setSelected(false);
@@ -151,13 +234,17 @@ public class UMLEditorForm extends JFrame {
         setJMenuBar(menuBar);
     }
 
-    private void prepareCanvas(){
-        workingDiagram = new ClassDiagram();
+    private void prepareCanvas(UMLDiagram diagram){
+        workingDiagram = diagram;
+        if(canvasScrollPane != null)
+        {
+            this.remove(canvasScrollPane);
+        }
         canvasScrollPane = new JScrollPane(workingDiagram);
         canvasScrollPane.setPreferredSize(new Dimension(800,600));
-
         add(canvasScrollPane, BorderLayout.CENTER);
-
+        revalidate();
+        repaint();
     }
 
     private void prepareDiagramType(){

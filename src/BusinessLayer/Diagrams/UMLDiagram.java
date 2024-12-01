@@ -1,14 +1,15 @@
 package BusinessLayer.Diagrams;
 
 import BusinessLayer.Components.UMLComponent;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.dnd.DropTargetListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 
+@JsonIgnoreProperties({"accessibleContext", "graphicsConfiguration", "rootPane", "layeredPane", "contentPane", "transferHandler", "inputMap", "actionMap", "clientProperty", "focusTraversalPolicyProvider", "focusCycleRoot"}) // Ignore JPanel's internal properties
 public abstract class UMLDiagram extends JPanel{
     String name;
     static ArrayList<UMLComponent> components;
@@ -20,11 +21,17 @@ public abstract class UMLDiagram extends JPanel{
     public abstract void removeComponent(UMLComponent component);
     public abstract void renderComponents(Graphics g);//draws all components on the canvas
 
+
+    public UMLDiagram()
+    {
+
+    }
     public static ArrayList<UMLComponent> getComponentList()
     {
         return components;
     }
 
+    public abstract ArrayList<UMLComponent> getListOfComponents();
     public void setupComponentForDiagram(UMLComponent component) {
         component.addMouseMotionListener(new MouseAdapter() {
             Point prevPoint;
@@ -60,8 +67,26 @@ public abstract class UMLDiagram extends JPanel{
     {
         return components.get(i);
     }
-    public int getComponentsCount()
-    {
-        return components.size();
+
+    //public abstract int getComponentsCount();
+
+    public void saveToFile(String fileName) {
     }
+
+    public void setComponents(ArrayList<UMLComponent> componentList) {
+        if (components != null) {
+            this.components = new ArrayList<>(componentList);  // Copy the input list to the internal list
+            revalidate();  // Revalidate the layout
+            repaint();     // Repaint the diagram after updating the components
+            System.out.println("Components have been set successfully.");
+        } else {
+            System.out.println("Error: Provided list of components is null.");
+        }
+    }
+
+    public UMLDiagram loadFromFile(String fileName) {
+        return null;
+    }
+
+    public abstract int getComponentsCount();
 }

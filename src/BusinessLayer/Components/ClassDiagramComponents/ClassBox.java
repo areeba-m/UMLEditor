@@ -1,13 +1,35 @@
 package BusinessLayer.Components.ClassDiagramComponents;
 
 import BusinessLayer.Components.UMLComponent;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import org.json.JSONObject;
 import ui.UMLEditorForm;
 
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
+import java.util.Collection;
 
+@JsonIgnoreProperties({
+        "accessibleContext",
+        "graphicsConfiguration",
+        "rootPane",
+        "layeredPane",
+        "contentPane",
+        "transferHandler",
+        "inputMap",
+        "actionMap",
+        "clientProperty",
+        "focusTraversalPolicyProvider",
+        "focusCycleRoot",
+        "UI", // Another internal property that could be ignored
+        "componentOrientation", // Component orientation
+        "focusTraversalPolicy", // Focus policy
+        "focusOwner" // Current focus owner
+})
 public class ClassBox extends UMLComponent {
+   // private static final long serialVersionUID = 1L; // Add serialVersionUID for version control
+
     ArrayList<String> attributes;
     ArrayList<String> methods;
     int height;
@@ -68,11 +90,11 @@ public class ClassBox extends UMLComponent {
 //        this.methods = new ArrayList<>();
 //        isGridPanel = false;
 //
-////        addMouseListener(new MouseAdapter() {
-////            @Override
-////            public void mousePressed(MouseEvent e) {
-////            }
-////        });
+    ////        addMouseListener(new MouseAdapter() {
+    ////            @Override
+    ////            public void mousePressed(MouseEvent e) {
+    ////            }
+    ////        });
 //    }
 //
     public void handleClassBoxPressed(MouseEvent e)
@@ -80,9 +102,9 @@ public class ClassBox extends UMLComponent {
         //when the classbox is selected set isSelected to true to identify it in the form
         setSelected(true);
         // Check if the click is inside this ClassBox
-            // Pass this ClassBox to UMLEditorForm so that it can update its attributes and methods
-            //form.setSelectedClassBox(ClassBox.this);
-            // Call updateTextArea method when clicked
+        // Pass this ClassBox to UMLEditorForm so that it can update its attributes and methods
+        //form.setSelectedClassBox(ClassBox.this);
+        // Call updateTextArea method when clicked
 //            if(isDropped) {
 //                String text = name + "\n";
 //                text += "----------------------------------------------------" + "\n";
@@ -138,21 +160,49 @@ public class ClassBox extends UMLComponent {
         return false;
     }
 
-     public void addAttribute(String[] list)
-     {
-         for(int i = 0; i < list.length; i++)
-         {
-             if(!checkAttributePresence(list[i])) {
-                 attributes.add(list[i]);
-             }
-         }
-         updatePreferredSize();
-         // Update bounds to avoid rendering issues
-         setBounds(getX(), getY(), getPreferredSize().width, getPreferredSize().height);
-         System.out.println("Height: "+height+", width: "+width);
+    public void addAttribute(String[] list)
+    {
+        for(int i = 0; i < list.length; i++)
+        {
+            if(!checkAttributePresence(list[i])) {
+                attributes.add(list[i]);
+            }
+        }
+        updatePreferredSize();
+        // Update bounds to avoid rendering issues
+        setBounds(getX(), getY(), getPreferredSize().width, getPreferredSize().height);
+        System.out.println("Height: "+height+", width: "+width);
 //         revalidate();
 //         repaint();
-     }
+    }
+    public void setAttributes(ArrayList<String> attributesList) {
+        if (attributesList != null) {
+            this.attributes.clear();
+            this.attributes.addAll((Collection<? extends String>) attributesList);
+        }
+    }
+    public void setPoint(Point point) {
+        if(point == null)
+        {
+            this.point = new Point(point);
+        }
+    }
+
+    public void setHeight(int height) {
+        this.height = height;
+    }
+
+    public void setWidth(int width) {
+        this.width = width;
+
+    }
+    // Setter for methods
+    public void setMethods(ArrayList<String> methodsList) {
+        if (methodsList != null) {
+            this.methods.clear();
+            this.methods.addAll((Collection<? extends String>) methodsList);
+        }
+    }
     public void addMethods(String[] list)
     {
         for(int i = 0; i < list.length; i++)
@@ -171,6 +221,15 @@ public class ClassBox extends UMLComponent {
     public Point getPoint()
     {
         return point;
+    }
+
+    public ArrayList<String> getAttributes()
+    {
+        return attributes;
+    }
+    public ArrayList<String> getMethods()
+    {
+        return methods;
     }
 
     public void handleClassBoxMousePressed(MouseEvent e)
@@ -237,6 +296,33 @@ public class ClassBox extends UMLComponent {
     public void draw(Graphics g) {
 
     }
+
+    @Override
+    public void setMethods(java.util.List<Object> methods) {
+        if (methods != null) {
+            this.methods.clear();
+            // Convert Object list to String list and add to methods
+            for (Object method : methods) {
+                if (method instanceof String) {
+                    this.methods.add((String) method);  // Add the method if it's a string
+                }
+            }
+        }
+    }
+
+    @Override
+    public void setAttributes(java.util.List<Object> attributes) {
+        if (attributes != null) {
+            this.attributes.clear();
+            // Convert Object list to String list and add to attributes
+            for (Object attribute : attributes) {
+                if (attribute instanceof String) {
+                    this.attributes.add((String) attribute);  // Add the attribute if it's a string
+                }
+            }
+        }
+    }
+
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
@@ -529,5 +615,26 @@ public class ClassBox extends UMLComponent {
         }
         revalidate(); // Notify the layout manager to adjust
         repaint();    // Request a repaint for the updated size
+    }
+    public JSONObject toJSON() {
+        JSONObject json = new JSONObject();
+
+        // Serialize inherited attributes
+        json.put("name", this.name);
+        json.put("classType", this.classType);
+
+        // Serialize the specific attributes of ClassBox
+        json.put("attributes", this.attributes);
+        json.put("methods", this.methods);
+        json.put("height", this.height);
+        json.put("width", this.width);
+
+        // Serialize the point (location)
+        json.put("point", new JSONObject()
+                .put("x", this.point.x)
+                .put("y", this.point.y));
+
+        // Return the JSON object
+        return json;
     }
 }
