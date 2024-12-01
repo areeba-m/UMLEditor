@@ -3,14 +3,37 @@ package BusinessLayer.Components;
 import BusinessLayer.Components.ClassDiagramComponents.ClassBox;
 import BusinessLayer.Diagrams.ClassDiagram;
 import BusinessLayer.Diagrams.UMLDiagram;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import ui.UMLEditorForm;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.Serializable;
+import java.util.List;
 
+@JsonIgnoreProperties({
+        "accessibleContext",
+        "graphicsConfiguration",
+        "rootPane",
+        "layeredPane",
+        "contentPane",
+        "transferHandler",
+        "inputMap",
+        "actionMap",
+        "clientProperty",
+        "focusTraversalPolicyProvider",
+        "focusCycleRoot",
+        "UI", // Another internal property that could be ignored
+        "componentOrientation", // Component orientation
+        "focusTraversalPolicy", // Focus policy
+        "focusOwner" // Current focus owner
+})
 public abstract class UMLComponent extends JComponent {
+    //private static final long serialVersionUID = 1L; // Adding serialVersionUID for version control
+
     protected String name;
     protected String classType;//i made this for class diagram
 
@@ -22,6 +45,7 @@ public abstract class UMLComponent extends JComponent {
     protected Point dragOffset;
     private boolean isSelected = false;
 
+    @JsonIgnore
     protected JTextArea textArea;
 
     public UMLComponent() {
@@ -34,19 +58,22 @@ public abstract class UMLComponent extends JComponent {
                 dragOffset = e.getPoint();
                 for(int i = 0; i < UMLDiagram.getComponentList().size(); i++)
                 {
-                    if(UMLDiagram.getComponentList().get(i).getLocation() == UMLComponent.this.getLocation())
+                    System.out.println("Component in list : "+ UMLDiagram.getComponentList().get(i).getLocation() + ", current: "+ UMLComponent.this.getLocation());
+                    if(UMLDiagram.getComponentList().get(i).getLocation().equals(UMLComponent.this.getLocation()))
                     {
+                        System.out.println("Condition true");
                         UMLComponent.this.setSelected(true);
                         UMLDiagram.getComponentList().get(i).setSelected(true);
                     }
                     else {
+                        System.out.println("Condition false");
                         UMLDiagram.getComponentList().get(i).setSelected(false);
                     }
                 }
-                 if(UMLComponent.this instanceof ClassBox) {
+                if(UMLComponent.this instanceof ClassBox) {
                     ClassBox obj = (ClassBox) UMLComponent.this;
                     obj.handleClassBoxMousePressed(e);
-                 }
+                }
             }
             @Override
             public void mouseReleased(MouseEvent e){
@@ -138,4 +165,25 @@ public abstract class UMLComponent extends JComponent {
 
     public abstract void draw(Graphics g);
 
+
+    public abstract void setMethods(List<Object> methods);
+
+    public abstract void setAttributes(List<Object> attributes);
+
+    public void setPoint(Point point) {
+    }
+
+    public void setHeight(int height) {
+    }
+
+    public void setWidth(int width) {
+
+    }
+
+    public void addAttribute(String[] att) {
+    }
+
+    public void addMethods(String[] meth) {
+
+    }
 }

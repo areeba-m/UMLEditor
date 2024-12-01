@@ -6,6 +6,7 @@ import BusinessLayer.Diagrams.UMLDiagram;
 import java.awt.*;
 import java.awt.geom.Path2D;
 import java.util.ArrayList;
+import java.util.List;
 
 public class Inheritence extends UMLComponent {
     ClassBox parent;
@@ -81,6 +82,16 @@ public class Inheritence extends UMLComponent {
     }
 
     public void draw(Graphics g){
+
+    }
+
+    @Override
+    public void setMethods(List<Object> methods) {
+
+    }
+
+    @Override
+    public void setAttributes(List<Object> attributes) {
 
     }
 }
