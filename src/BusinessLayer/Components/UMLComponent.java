@@ -1,18 +1,21 @@
 package BusinessLayer.Components;
 
 import BusinessLayer.Components.ClassDiagramComponents.ClassBox;
+import BusinessLayer.Components.ClassDiagramComponents.ClassDiagramRelationship;
 import BusinessLayer.Diagrams.ClassDiagram;
 import BusinessLayer.Diagrams.UMLDiagram;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import ui.UMLEditorForm;
-
+import BusinessLayer.Components.ClassDiagramComponents.ClassBox;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.io.Serializable;
 import java.util.List;
+
+import static BusinessLayer.Diagrams.UMLDiagram.components;
 
 @JsonIgnoreProperties({
         "accessibleContext",
@@ -32,72 +35,87 @@ import java.util.List;
         "focusOwner" // Current focus owner
 })
 public abstract class UMLComponent extends JComponent {
-    //private static final long serialVersionUID = 1L; // Adding serialVersionUID for version control
-
     protected String name;
-    protected String classType;//i made this for class diagram
-
     protected Point point;
-
-    protected boolean isGridPanel = false;
-    protected boolean isDropped = false;
+    protected String classType;//i made this for class diagram
 
     protected Point dragOffset;
     private boolean isSelected = false;
-
+    protected boolean isGridPanel = false;
+    protected boolean isDropped = false;
     @JsonIgnore
-    protected JTextArea textArea;
+    protected static JTextArea textArea;
 
     public UMLComponent() {
 
+        textArea = UMLEditorForm.getTextArea();
         // Add mouse listeners for drag functionality
         addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
-                // Store the offset where the mouse was clicked
                 dragOffset = e.getPoint();
-                for(int i = 0; i < UMLDiagram.getComponentList().size(); i++)
-                {
-                    System.out.println("Component in list : "+ UMLDiagram.getComponentList().get(i).getLocation() + ", current: "+ UMLComponent.this.getLocation());
-                    if(UMLDiagram.getComponentList().get(i).getLocation().equals(UMLComponent.this.getLocation()))
-                    {
-                        System.out.println("Condition true");
-                        UMLComponent.this.setSelected(true);
-                        UMLDiagram.getComponentList().get(i).setSelected(true);
-                    }
-                    else {
-                        System.out.println("Condition false");
-                        UMLDiagram.getComponentList().get(i).setSelected(false);
-                    }
+
+                for (UMLComponent component :components) {
+                    component.setSelected(false);
                 }
-                if(UMLComponent.this instanceof ClassBox) {
-                    ClassBox obj = (ClassBox) UMLComponent.this;
+                if (UMLComponent.this.contains(e.getPoint())) {
+                    UMLComponent.this.setSelected(true);
+
+                }
+
+                if(UMLComponent.this instanceof ClassBox obj) {
                     obj.handleClassBoxMousePressed(e);
                 }
+                else{
+                    // class box specifically sets its own text
+                    textArea.setText(getName());
+                    textArea.requestFocus();
+                }
+
             }
             @Override
             public void mouseReleased(MouseEvent e){
-                if(UMLComponent.this instanceof ClassBox){
-                    ClassBox obj = (ClassBox) UMLComponent.this;
-                    obj.handleClassBoxMouseReleased(e);
+                boolean clickedOnComponent = false;
+                // Check if the click is on any component
+                for (UMLComponent component : components) {
+                    if (component.contains(e.getPoint())) {
+                        clickedOnComponent = true;
+                        break;
+                    }
                 }
+                // If no component was clicked, deselect all
+                if (!clickedOnComponent) {
+                    for (UMLComponent component : components) {
+                        component.setSelected(false);
+                    }
+                }
+
+                if(UMLComponent.this instanceof ClassBox obj){
+                    //obj.handleClassBoxMouseReleased(e);
+                }
+
             }
         });
 
         addMouseMotionListener(new MouseAdapter() {
             @Override
             public void mouseDragged(MouseEvent e) {
-                // Update the component's location based on mouse movement
-                if(UMLComponent.this instanceof ClassBox) {
-                    ClassBox obj = (ClassBox) UMLComponent.this;
+
+                if(UMLComponent.this instanceof  UseCaseDiagramRelationship ||
+                        UMLComponent.this instanceof ClassDiagramRelationship){
+                    return;
+                }
+
+                if(UMLComponent.this instanceof ClassBox obj) {
                     obj.handleClassBoxMouseDragged(e);
                 }
-//                Point newLocation = getParent().getMousePosition();
-//                if (newLocation != null) {
-//                    setLocation(newLocation.x - dragOffset.x, newLocation.y - dragOffset.y);
-//                    getParent().revalidate();
-//                    getParent().repaint();
-//                }
+
+                Point newLocation = getParent().getMousePosition();
+                if (newLocation != null) {
+                    setLocation(newLocation.x - dragOffset.x, newLocation.y - dragOffset.y);
+                    getParent().revalidate();
+                    getParent().repaint();
+                }
             }
         });
     }
@@ -118,6 +136,16 @@ public abstract class UMLComponent extends JComponent {
     public void setType(String type)
     {
         classType = type;
+
+        if (classType.equalsIgnoreCase("simple")){
+            setPreferredSize(new Dimension(120, 100));
+        } else if (classType.equalsIgnoreCase("abstract")){
+            setPreferredSize(new Dimension(120, 100));
+        } else if (classType.equalsIgnoreCase("interface")){
+            setPreferredSize(new Dimension(120, 150));
+        }
+        revalidate();
+        repaint();
     }
 
     public void setIsDropped(boolean flag)
@@ -153,26 +181,30 @@ public abstract class UMLComponent extends JComponent {
         return isGridPanel;
     }
 
-    public void setName(String name)
-    {
-        this.name = name;
-    }
-    public String getName()
-    {
+    @Override
+    public String getName() {
         return name;
+    }
+
+    @Override
+    public void setName(String name) {
+        this.name = name;
+        repaint();
     }
     public abstract void updateFromTextArea();
 
     public abstract void draw(Graphics g);
-
-
     public abstract void setMethods(List<Object> methods);
 
     public abstract void setAttributes(List<Object> attributes);
 
-    public void setPoint(Point point) {
+    public Point getPoint() {
+        return point;
     }
 
+    public void setPoint(Point point) {
+        this.point = point;
+    }
     public void setHeight(int height) {
     }
 

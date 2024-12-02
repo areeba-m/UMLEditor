@@ -27,11 +27,11 @@ import java.util.Collection;
         "focusTraversalPolicy", // Focus policy
         "focusOwner" // Current focus owner
 })
-public class ClassBox extends UMLComponent {
-   // private static final long serialVersionUID = 1L; // Add serialVersionUID for version control
 
+public class ClassBox extends UMLComponent {
     ArrayList<String> attributes;
     ArrayList<String> methods;
+    ArrayList<ClassDiagramRelationship> relationships;
     int height;
     int width;
     //String classType; shifted to UMLComponent
@@ -45,6 +45,7 @@ public class ClassBox extends UMLComponent {
         this.classType = "";
         this.attributes = new ArrayList<>();
         this.methods = new ArrayList<>();
+        this.relationships = new ArrayList<>();
 
         this.height = 60;
         this.width = 100;
@@ -57,61 +58,33 @@ public class ClassBox extends UMLComponent {
 
     @Override
     public void updateFromTextArea() {
-//        String[] sections = textArea.getText().split("\n----------------------------------------\n");
-//        attributes.clear();
-//        methods.clear();
-//        String[] attributes = new String[0];
-//
-//        String[] methods = new String[0];
-//        for(int i = 0; i < sections.length; i++)
-//        {
-//            if(i == 0)
-//            {
-//                setName(sections[0]);
-//            }
-//            else if(i == 1)
-//            {
-//                attributes  = sections[1].split("\n");
-//            }
-//            else if(i == 2)
-//            {
-//                methods = sections[2].split("\n");
-//            }
-//        }
-//        addAttribute(attributes);
-//        addMethods(methods);
-//        repaint();
-        //public void updateFromTextArea() {
-            // Split the text area content using the divider lines
-            String[] sections = textArea.getText().split("\n----------------------------------------\n");
+        String[] sections = textArea.getText().split("\n----------------------------------------\n");
 
-            // Clear existing attributes and methods
-            attributes.clear();
-            methods.clear();
+        // Clear existing attributes and methods
+        attributes.clear();
+        methods.clear();
 
-            // Ensure the class name is always set (if available)
-            if (sections.length > 0 && !sections[0].isBlank()) {
-                setName(sections[0].trim());
-            }
+        // Ensure the class name is always set (if available)
+        if (sections.length > 0 && !sections[0].isBlank()) {
+            setName(sections[0].trim());
+        }
 
-            // Handle attributes section, if present
-            String[] attributes = new String[0];
-            if (sections.length > 1 && !sections[1].isBlank()) {
-                attributes = sections[1].split("\n");
-            }
-            addAttribute(attributes);
+        // Handle attributes section, if present
+        String[] attributes = new String[0];
+        if (sections.length > 1 && !sections[1].isBlank()) {
+            attributes = sections[1].split("\n");
+        }
+        addAttribute(attributes);
 
-            // Handle methods section, if present
-            String[] methods = new String[0];
-            if (sections.length > 2 && !sections[2].isBlank()) {
-                methods = sections[2].split("\n");
-            }
-            addMethods(methods);
+        // Handle methods section, if present
+        String[] methods = new String[0];
+        if (sections.length > 2 && !sections[2].isBlank()) {
+            methods = sections[2].split("\n");
+        }
+        addMethods(methods);
 
-            // Repaint to reflect changes
-            repaint();
-      //  }
-
+        // Repaint to reflect changes
+        repaint();
     }
 //    public ClassBox(String name, String type)
 //    {
@@ -122,11 +95,11 @@ public class ClassBox extends UMLComponent {
 //        this.methods = new ArrayList<>();
 //        isGridPanel = false;
 //
-    ////        addMouseListener(new MouseAdapter() {
-    ////            @Override
-    ////            public void mousePressed(MouseEvent e) {
-    ////            }
-    ////        });
+////        addMouseListener(new MouseAdapter() {
+////            @Override
+////            public void mousePressed(MouseEvent e) {
+////            }
+////        });
 //    }
 //
     public void handleClassBoxPressed(MouseEvent e)
@@ -134,9 +107,9 @@ public class ClassBox extends UMLComponent {
         //when the classbox is selected set isSelected to true to identify it in the form
         setSelected(true);
         // Check if the click is inside this ClassBox
-        // Pass this ClassBox to UMLEditorForm so that it can update its attributes and methods
-        //form.setSelectedClassBox(ClassBox.this);
-        // Call updateTextArea method when clicked
+            // Pass this ClassBox to UMLEditorForm so that it can update its attributes and methods
+            //form.setSelectedClassBox(ClassBox.this);
+            // Call updateTextArea method when clicked
 //            if(isDropped) {
 //                String text = name + "\n";
 //                text += "----------------------------------------------------" + "\n";
@@ -192,21 +165,37 @@ public class ClassBox extends UMLComponent {
         return false;
     }
 
-    public void addAttribute(String[] list)
+    public void addMethods(String[] list)
     {
         for(int i = 0; i < list.length; i++)
         {
-            if(!checkAttributePresence(list[i])) {
-                attributes.add(list[i]);
+            if(!checkMethodsPresence(list[i])) {
+                methods.add(list[i]);
             }
         }
         updatePreferredSize();
         // Update bounds to avoid rendering issues
         setBounds(getX(), getY(), getPreferredSize().width, getPreferredSize().height);
         System.out.println("Height: "+height+", width: "+width);
+//        revalidate();
+//        repaint();
+    }
+
+     public void addAttribute(String[] list)
+     {
+         for(int i = 0; i < list.length; i++)
+         {
+             if(!checkAttributePresence(list[i])) {
+                 attributes.add(list[i]);
+             }
+         }
+         updatePreferredSize();
+         // Update bounds to avoid rendering issues
+         setBounds(getX(), getY(), getPreferredSize().width, getPreferredSize().height);
+         System.out.println("Height: "+height+", width: "+width);
 //         revalidate();
 //         repaint();
-    }
+     }
     public void setAttributes(ArrayList<String> attributesList) {
         if (attributesList != null) {
             this.attributes.clear();
@@ -235,33 +224,10 @@ public class ClassBox extends UMLComponent {
             this.methods.addAll((Collection<? extends String>) methodsList);
         }
     }
-    public void addMethods(String[] list)
-    {
-        for(int i = 0; i < list.length; i++)
-        {
-            if(!checkMethodsPresence(list[i])) {
-                methods.add(list[i]);
-            }
-        }
-        updatePreferredSize();
-        // Update bounds to avoid rendering issues
-        setBounds(getX(), getY(), getPreferredSize().width, getPreferredSize().height);
-        System.out.println("Height: "+height+", width: "+width);
-//        revalidate();
-//        repaint();
-    }
+
     public Point getPoint()
     {
         return point;
-    }
-
-    public ArrayList<String> getAttributes()
-    {
-        return attributes;
-    }
-    public ArrayList<String> getMethods()
-    {
-        return methods;
     }
 
     public void handleClassBoxMousePressed(MouseEvent e)
@@ -303,13 +269,9 @@ public class ClassBox extends UMLComponent {
     }
     public void handleClassBoxMouseReleased(MouseEvent e)
     {
-//        setSelected(false);
-//        textArea.setText("Add Diagram Notes.");
     }
     public void handleClassBoxMouseDragged(MouseEvent e)
     {
-//        this.point = e.getPoint();
-//        updatePreferredSize();
         if (point != null) {
             Point currentLocation = getLocation();
             int deltaX = e.getX() - point.x;
@@ -329,7 +291,6 @@ public class ClassBox extends UMLComponent {
     public void draw(Graphics g) {
 
     }
-
     @Override
     public void setMethods(java.util.List<Object> methods) {
         if (methods != null) {
@@ -342,7 +303,6 @@ public class ClassBox extends UMLComponent {
             }
         }
     }
-
     @Override
     public void setAttributes(java.util.List<Object> attributes) {
         if (attributes != null) {
@@ -355,7 +315,6 @@ public class ClassBox extends UMLComponent {
             }
         }
     }
-
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
@@ -618,7 +577,21 @@ public class ClassBox extends UMLComponent {
                 methodY += 20;
             }
         }
+        if (isSelected()) {
+            // Save the original stroke
+            Stroke originalStroke = g2d.getStroke();
 
+            // Create a dashed stroke
+            float[] dashPattern = {5.0f, 5.0f}; // Dash length, gap length
+            g2d.setStroke(new BasicStroke(1.5f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 10.0f, dashPattern, 0.0f));
+
+            // Draw the dashed rectangle
+            g2d.setColor(Color.BLUE); // Set the color of the dashed rectangle
+            g2d.drawRect(0, 0, getWidth() - 1, getHeight() - 1);
+
+            // Restore the original stroke
+            g2d.setStroke(originalStroke);
+        }
     }
     public void updatePreferredSize() {
         FontMetrics metrics = getFontMetrics(getFont());
@@ -649,6 +622,20 @@ public class ClassBox extends UMLComponent {
         revalidate(); // Notify the layout manager to adjust
         repaint();    // Request a repaint for the updated size
     }
+    public void addRelationship(ClassDiagramRelationship relationship) {
+        if (!relationships.contains(relationship)) {
+            relationships.add(relationship);
+        }
+    }
+
+    public void removeRelationship(ClassDiagramRelationship relationship) {
+        relationships.remove(relationship);
+    }
+
+    public ArrayList<ClassDiagramRelationship> getRelationships() {
+        return relationships;
+    }
+
     public JSONObject toJSON() {
         JSONObject json = new JSONObject();
 
