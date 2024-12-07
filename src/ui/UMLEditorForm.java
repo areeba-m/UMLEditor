@@ -8,6 +8,7 @@ import BusinessLayer.Components.UseCaseDiagramComponents.UseCaseDiagramRelations
 import BusinessLayer.Diagrams.ClassDiagram;
 import BusinessLayer.Diagrams.UMLDiagram;
 import BusinessLayer.Diagrams.UseCaseDiagram;
+import Data.CodeGenerator;
 
 import javax.swing.*;
 import java.awt.*;
@@ -15,6 +16,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.*;
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 
 public class UMLEditorForm extends JFrame {
@@ -474,15 +476,19 @@ public class UMLEditorForm extends JFrame {
 
         if (userSelection == JFileChooser.APPROVE_OPTION) {
             File selectedDirectory = directoryChooser.getSelectedFile();
-
-            // Perform your code generation logic here
-            //workingDiagram.generate code or something
-
             System.out.println("Selected Directory: " + selectedDirectory.getAbsolutePath());
-            JOptionPane.showMessageDialog(null,
-                    "Code files will be generated in: " + selectedDirectory.getAbsolutePath(),
-                    "Directory Selected",
-                    JOptionPane.INFORMATION_MESSAGE);
+
+            CodeGenerator codeGenerator = new CodeGenerator(workingDiagram.getComponentArr());
+            try {
+                codeGenerator.generateCode(selectedDirectory);
+
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(this,
+                        "Could not generate code files: " + ex.getMessage(),
+                        "Code Generation Error", JOptionPane.WARNING_MESSAGE
+                );
+            }
+
         } else {
             System.out.println("Directory selection was cancelled.");
         }

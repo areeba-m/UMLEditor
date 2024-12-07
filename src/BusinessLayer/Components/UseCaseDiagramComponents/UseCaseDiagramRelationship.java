@@ -411,8 +411,6 @@ public class UseCaseDiagramRelationship extends UMLComponent {
 
     private void updateBounds() {
         if (from == null || to == null) {
-            int x = Math.min(startPoint.x, endPoint.x) - 10; // Add padding for x
-            int y = Math.min(startPoint.y, endPoint.y) - 10; // Add padding for y
             int width = Math.abs(endPoint.x - startPoint.x) + 20; // Add padding for width
             int height = Math.abs(endPoint.y - startPoint.y) + 20; // Add padding for height
 

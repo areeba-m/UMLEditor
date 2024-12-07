@@ -60,8 +60,12 @@ public class ClassBox extends UMLComponent {
                 methods = sections[2].split("\n");
             }
         }
-        addAttribute(attributes);
-        addMethods(methods);
+        if(this.classType.equalsIgnoreCase("interface")){
+            addMethods(attributes);
+        } else {
+            addAttribute(attributes);
+            addMethods(methods);
+        }
         repaint();
     }
 
@@ -115,31 +119,6 @@ public class ClassBox extends UMLComponent {
 
     public void handleClassBoxMousePressed(MouseEvent e)
     {
-        /*//setSelected(true);
-        String text = name;
-        text += "\n";
-        //starting attributes
-        for(int i = 0; i < 40; i++)
-        {
-            text += "-";
-        }
-        text += "\n";
-        for(int i = 0; i < attributes.size(); i++)
-        {
-            text += attributes.get(i);
-            text += "\n";
-        }
-        //starting methods
-        for(int i = 0; i < 40; i++)
-        {
-            text += "-";
-        }
-        text += "\n";
-        for(int i = 0; i < methods.size(); i++)
-        {
-            text += methods.get(i);
-            text += "\n";
-        }*/
         String text = name.concat("\n--\n");
         for(String attribute:attributes){
             text = text.concat(attribute + "\n");
@@ -411,6 +390,21 @@ public class ClassBox extends UMLComponent {
 
     public void addRelationship(ClassDiagramRelationship relationship) {
         if (!relationships.contains(relationship)) {
+            // if relationship is inheritance & current class is a child,
+            // check for abstract methods & update my method list
+
+            //if(relationship.getFrom().equals(this)){
+                // get parent's
+            //}
+
+
+
+
+
+
+
+
+
             relationships.add(relationship);
         }
     }
@@ -421,6 +415,24 @@ public class ClassBox extends UMLComponent {
 
     public ArrayList<ClassDiagramRelationship> getRelationships() {
         return relationships;
+    }
+
+    public ArrayList<String> getAttributes() {
+        return attributes;
+    }
+
+    public ArrayList<String> getMethods() {
+        return methods;
+    }
+
+    @Override
+    public int getHeight() {
+        return height;
+    }
+
+    @Override
+    public int getWidth() {
+        return width;
     }
 }
 /*
