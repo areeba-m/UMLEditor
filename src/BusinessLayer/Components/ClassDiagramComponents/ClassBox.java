@@ -5,6 +5,8 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.json.JSONObject;
 import ui.UMLEditorForm;
 
+import javax.swing.*;
+import javax.swing.text.*;
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
@@ -58,7 +60,7 @@ public class ClassBox extends UMLComponent {
 
     @Override
     public void updateFromTextArea() {
-        String[] sections = textArea.getText().split("\n----------------------------------------\n");
+        String[] sections = textArea.getText().split("\n--\n");
 
         // Clear existing attributes and methods
         attributes.clear();
@@ -68,14 +70,14 @@ public class ClassBox extends UMLComponent {
         if (sections.length > 0 && !sections[0].isBlank()) {
             setName(sections[0].trim());
         }
-
         // Handle attributes section, if present
         String[] attributes = new String[0];
         if (sections.length > 1 && !sections[1].isBlank()) {
             attributes = sections[1].split("\n");
         }
-        addAttribute(attributes);
-
+        if(!classType.equals("Interface")) {
+            addAttribute(attributes);
+        }
         // Handle methods section, if present
         String[] methods = new String[0];
         if (sections.length > 2 && !sections[2].isBlank()) {
@@ -177,16 +179,12 @@ public class ClassBox extends UMLComponent {
         return point;
     }
 
-    public void handleClassBoxMousePressed(MouseEvent e)
-    {
-        //setSelected(true);
+    public void handleClassBoxMousePressed(MouseEvent e) {
         String text = name;
         text += "\n";
         //starting attributes
-        for(int i = 0; i < 40; i++)
-        {
-            text += "-";
-        }
+
+            text += "--";
         text += "\n";
         if(attributes.size() <= 0) {
             text += "\n";
@@ -197,10 +195,7 @@ public class ClassBox extends UMLComponent {
             text += "\n";
         }
         //starting methods
-        for(int i = 0; i < 40; i++)
-        {
-            text += "-";
-        }
+            text += "--";
         text += "\n";
         for(int i = 0; i < methods.size(); i++)
         {
@@ -210,11 +205,12 @@ public class ClassBox extends UMLComponent {
         textArea.removeAll();
         textArea.setText(text);
 
-            // Update bounds to avoid rendering issues
-            setBounds(getX(), getY(), getPreferredSize().width, getPreferredSize().height);
-            // Repaint parent to clear artifacts
-            getParent().repaint();
+        // Update bounds to avoid rendering issues
+        setBounds(getX(), getY(), getPreferredSize().width, getPreferredSize().height);
+        // Repaint parent to clear artifacts
+        getParent().repaint();
     }
+
     public void handleClassBoxMouseReleased(MouseEvent e)
     {
     }
@@ -327,7 +323,9 @@ public class ClassBox extends UMLComponent {
             // Leave attributes and methods sections empty
             int attributeY = dividerY1 + padding+10;
             for (String attribute : attributes) {
-                g2d.drawString(attribute, x + padding, attributeY);
+//                g2d.drawString(attribute, x + padding, attributeY);
+//                attributeY += 20;
+                // Move to the next line
                 attributeY += 20;
             }
 
@@ -337,7 +335,22 @@ public class ClassBox extends UMLComponent {
 
             int methodY = dividerY2 + padding +10;
             for (String method : methods) {
-                g2d.drawString(method, x + padding, methodY);
+                // Check if the method starts and ends with '_'
+                if (method.startsWith("_") && method.endsWith("_")) {
+                    // Remove the underscores for drawing the string
+                    String displayText = method.substring(1, method.length() - 1);
+                    g2d.drawString(displayText, x + padding, methodY);
+
+                    // Measure the width of the string to draw the underline
+                    int stringWidth = g2d.getFontMetrics().stringWidth(displayText);
+                    int underlineY = methodY + 2; // Slightly below the text baseline
+                    g2d.drawLine(x + padding, underlineY, x + padding + stringWidth, underlineY);
+                }
+                // Default case: draw the string as-is
+                else {
+                    g2d.drawString(method, x + padding, methodY);
+                }
+                // Move to the next line
                 methodY += 20;
             }
         }
@@ -387,7 +400,23 @@ public class ClassBox extends UMLComponent {
 // Draw attributes
             int attributeY = dividerY1 + padding+10;
             for (String attribute : attributes) {
-                g2d.drawString(attribute, x + padding, attributeY);
+//                g2d.drawString(attribute, x + padding, attributeY);
+//                attributeY += 20;
+                if (attribute.startsWith("_") && attribute.endsWith("_")) {//underlining static attribute
+                    // Remove the underscores for drawing the string
+                    String displayText = attribute.substring(1, attribute.length() - 1);
+                    g2d.drawString(displayText, x + padding, attributeY);
+
+                    // Measure the width of the string to draw the underline
+                    int stringWidth = g2d.getFontMetrics().stringWidth(displayText);
+                    int underlineY = attributeY + 2; // Slightly below the text baseline
+                    g2d.drawLine(x + padding, underlineY, x + padding + stringWidth, underlineY);
+                } else {
+                    // Draw the string as-is
+                    g2d.drawString(attribute, x + padding, attributeY);
+                }
+
+                // Move to the next line
                 attributeY += 20;
             }
 
@@ -398,7 +427,38 @@ public class ClassBox extends UMLComponent {
 // Draw methods
             int methodY = dividerY2 + padding+10;
             for (String method : methods) {
-                g2d.drawString(method, x + padding, methodY);
+                // Check if the method starts and ends with '/'
+                if (method.startsWith("/") && method.endsWith("/")) {
+                    // Remove the slashes for drawing the string
+                    String displayText = method.substring(1, method.length() - 1);
+
+                    // Set the font to italic
+                    Font originalFont2 = g2d.getFont();
+                    Font italicFont = new Font("Serif", Font.ITALIC, originalFont2.getSize()); // Use a specific font that supports italic
+                    g2d.setFont(italicFont);
+
+                    // Draw the italicized text
+                    g2d.drawString(displayText, x + padding, methodY);
+
+                    // Restore the original font
+                    g2d.setFont(originalFont2);
+                }
+                // Check if the method starts and ends with '_'
+                else if (method.startsWith("_") && method.endsWith("_")) {
+                    // Remove the underscores for drawing the string
+                    String displayText = method.substring(1, method.length() - 1);
+                    g2d.drawString(displayText, x + padding, methodY);
+
+                    // Measure the width of the string to draw the underline
+                    int stringWidth = g2d.getFontMetrics().stringWidth(displayText);
+                    int underlineY = methodY + 2; // Slightly below the text baseline
+                    g2d.drawLine(x + padding, underlineY, x + padding + stringWidth, underlineY);
+                }
+                // Default case: draw the string as-is
+                else {
+                    g2d.drawString(method, x + padding, methodY);
+                }
+                // Move to the next line
                 methodY += 20;
             }
         }
@@ -437,7 +497,22 @@ public class ClassBox extends UMLComponent {
 // Draw attributes
             int attributeY = dividerY1 + padding+10;
             for (String attribute : attributes) {
-                g2d.drawString(attribute, x + padding, attributeY);
+                // Check if the attribute starts and ends with '_'
+                if (attribute.startsWith("_") && attribute.endsWith("_")) {
+                    // Remove the underscores for drawing the string
+                    String displayText = attribute.substring(1, attribute.length() - 1);
+                    g2d.drawString(displayText, x + padding, attributeY);
+
+                    // Measure the width of the string to draw the underline
+                    int stringWidth = g2d.getFontMetrics().stringWidth(displayText);
+                    int underlineY = attributeY + 2; // Slightly below the text baseline
+                    g2d.drawLine(x + padding, underlineY, x + padding + stringWidth, underlineY);
+                } else {
+                    // Draw the string as-is
+                    g2d.drawString(attribute, x + padding, attributeY);
+                }
+
+                // Move to the next line
                 attributeY += 20;
             }
 
@@ -448,7 +523,38 @@ public class ClassBox extends UMLComponent {
 // Draw methods
             int methodY = dividerY2 + padding+10;
             for (String method : methods) {
-                g2d.drawString(method, x + padding, methodY);
+                // Check if the method starts and ends with '/'
+                if (method.startsWith("/") && method.endsWith("/")) {
+                    // Remove the slashes for drawing the string
+                    String displayText = method.substring(1, method.length() - 1);
+
+                    // Set the font to italic
+                    Font originalFont = g2d.getFont();
+                    Font italicFont = new Font("Serif", Font.ITALIC, originalFont.getSize()); // Use a specific font that supports italic
+                    g2d.setFont(italicFont);
+
+                    // Draw the italicized text
+                    g2d.drawString(displayText, x + padding, methodY);
+
+                    // Restore the original font
+                    g2d.setFont(originalFont);
+                }
+                // Check if the method starts and ends with '_'
+                else if (method.startsWith("_") && method.endsWith("_")) {
+                    // Remove the underscores for drawing the string
+                    String displayText = method.substring(1, method.length() - 1);
+                    g2d.drawString(displayText, x + padding, methodY);
+
+                    // Measure the width of the string to draw the underline
+                    int stringWidth = g2d.getFontMetrics().stringWidth(displayText);
+                    int underlineY = methodY + 2; // Slightly below the text baseline
+                    g2d.drawLine(x + padding, underlineY, x + padding + stringWidth, underlineY);
+                }
+                // Default case: draw the string as-is
+                else {
+                    g2d.drawString(method, x + padding, methodY);
+                }
+                // Move to the next line
                 methodY += 20;
             }
         }
@@ -469,6 +575,11 @@ public class ClassBox extends UMLComponent {
         }
     }
     public void updatePreferredSize() {
+        if(getFont() == null)
+        {
+            Font font = new Font("Segoe UI Emoji", Font.PLAIN, 14);
+            setFont(font);
+        }
         FontMetrics metrics = getFontMetrics(getFont());
         int maxTextWidth = metrics.stringWidth(name); // Start with class name width
 

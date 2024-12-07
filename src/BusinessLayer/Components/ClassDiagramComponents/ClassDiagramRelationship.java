@@ -12,12 +12,16 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Path2D;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class ClassDiagramRelationship extends UMLComponent{
 
     Point centerPoint;
     Point endPoint;
+
+    String startMultiplicity;
+    String endMultiplicity;
 
     private UMLComponent from;
     private UMLComponent to;
@@ -65,15 +69,72 @@ public class ClassDiagramRelationship extends UMLComponent{
     }
 
     @Override
-    public void updateFromTextArea() {
-
-    }
-
-    @Override
     public void draw(Graphics g) {
 
     }
 
+    public void handleMousePressed()
+    {
+        String text = name;
+        text += "\n";
+        //starting attributes
+
+        text += "--";
+        text += "\n";
+
+        if(name.equalsIgnoreCase("inheritance"))
+        {
+            startMultiplicity = "Multiplicity Not Allowed";
+        }
+        text += startMultiplicity;
+        text += "\n";
+        //starting methods
+        text += "--";
+        text += "\n";
+
+        if(name.equalsIgnoreCase("inheritance"))
+        {
+            endMultiplicity = "Multiplicity Not Allowed";
+        }
+        else if(name.equalsIgnoreCase("composition"))
+        {
+            endMultiplicity = "1";
+        }
+        else if(name.equalsIgnoreCase("aggregation"))
+        {
+            endMultiplicity = "1";
+        }
+        text += endMultiplicity;
+        text += "\n";
+
+        textArea.removeAll();
+        textArea.setText(text);
+
+        // Update bounds to avoid rendering issues
+        //setBounds(getX(), getY(), getPreferredSize().width, getPreferredSize().height);
+        // Repaint parent to clear artifacts
+        getParent().repaint();
+    }
+    @Override
+    public void updateFromTextArea() {
+        String[] sections = textArea.getText().split("\n--\n");
+
+        // Ensure the class name is always set (if available)
+        if (sections.length > 0 && !sections[0].isBlank()) {
+            setName(sections[0].trim());
+        }
+        startMultiplicity = "";
+        if (sections.length > 1 && !sections[1].isBlank()) {
+            startMultiplicity = Arrays.toString(sections[1].split("\n"));
+        }
+        endMultiplicity = "";
+        if (sections.length > 2 && !sections[2].isBlank()) {
+            endMultiplicity = Arrays.toString(sections[2].split("\n"));
+        }
+
+        // Repaint to reflect changes
+        repaint();
+    }
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
@@ -92,12 +153,12 @@ public class ClassDiagramRelationship extends UMLComponent{
 
         // Draw the relationship-specific symbols at the end
         if (name.equalsIgnoreCase("aggregation")) {
-            endPoint.setLocation(endPoint.x-10, endPoint.y -10);
-            g2d.drawLine(point.x, point.y, endPoint.x, endPoint.y);
+            //endPoint.setLocation(endPoint.x-5, endPoint.y -10);
+            //g2d.drawLine(point.x, point.y, endPoint.x, endPoint.y);
             drawHollowDiamond(g2d, endPoint.x, endPoint.y);
         } else if (name.equalsIgnoreCase("composition")) {
-            endPoint.setLocation(endPoint.x- 10, endPoint.y -10);
-            g2d.drawLine(point.x, point.y, endPoint.x, endPoint.y);
+            //endPoint.setLocation(endPoint.x-5, endPoint.y -10);
+            //g2d.drawLine(point.x, point.y, endPoint.x, endPoint.y);
             drawFilledDiamond(g2d, endPoint.x, endPoint.y);
         } else if (name.equalsIgnoreCase("inheritance")) {
             //endPoint.setLocation(endPoint.x-10, endPoint.y-10)
@@ -115,35 +176,120 @@ public class ClassDiagramRelationship extends UMLComponent{
         }
     }
 
+private void drawHollowDiamond(Graphics2D g2d, int x, int y) {
+    int size = 8;
 
-    // Method to draw a hollow diamond (aggregation)
-    private void drawHollowDiamond(Graphics2D g2d, int x, int y) {
-        int size = 8;
-        Path2D.Double diamond = new Path2D.Double();
-        diamond.moveTo(x, y - size); // top
-        diamond.lineTo(x + size, y); // right
-        diamond.lineTo(x, y + size); // bottom
-        diamond.lineTo(x - size, y); // left
-        diamond.closePath();
-        g2d.setColor(Color.WHITE);
-        g2d.fill(diamond);
+    int dx = x - point.x;
+    int dy = y - point.y;
+    // Normalize the direction vector
+    double distance = Math.sqrt(dx * dx + dy * dy);
+    double unitDx = dx / distance;
+    double unitDy = dy / distance;
 
-// Draw the outline of the triangle with black
-        g2d.setColor(Color.BLACK);
-        g2d.draw(diamond);
+    // Offset the diamond position slightly back from the endpoint
+    double offsetX = x - unitDx * size;
+    double offsetY = y - unitDy * size;
+
+    // Calculate the line endpoint so it stops at the diamond
+    int trimmedX = (int) (offsetX);
+    int trimmedY = (int) (offsetY);
+
+    // Draw the trimmed line
+    g2d.drawLine(point.x, point.y, trimmedX, trimmedY);
+
+    // Draw the hollow diamond
+    Path2D.Double diamond = new Path2D.Double();
+    diamond.moveTo(offsetX, offsetY - size); // top
+    diamond.lineTo(offsetX + size, offsetY); // right
+    diamond.lineTo(offsetX, offsetY + size); // bottom
+    diamond.lineTo(offsetX - size, offsetY); // left
+    diamond.closePath();
+
+    // Fill the diamond
+    g2d.setColor(Color.WHITE);
+    g2d.fill(diamond);
+
+    // Draw the outline of the diamond
+    g2d.setColor(Color.BLACK);
+    g2d.draw(diamond);
+
+
+    g2d.setColor(Color.BLACK); // Set text color
+    // Draw multiplicities
+    if (startMultiplicity != null && !startMultiplicity.isEmpty()) {
+        // Strip brackets if present
+        String cleanedStart = startMultiplicity.replace("[", "").replace("]", "");
+
+        // Position the start multiplicity further behind the point, opposite direction towards the diamond
+        int startX = (int) (point.x - unitDx * (size - 30)); // Move further back from the point towards the diamond
+        int startY = (int) (point.y - unitDy * (size - 30)); // Similarly adjust the Y position
+        g2d.drawString(cleanedStart, startX, startY);
     }
+
+    if (endMultiplicity != null && !endMultiplicity.isEmpty()) {
+        // Strip brackets if present
+        String cleanedEnd = endMultiplicity.replace("[", "").replace("]", "");
+        int endX = (int) (offsetX - unitDx * (size + 10)); // Position behind the diamond
+        int endY = (int) (offsetY - unitDy * (size + 10));
+        g2d.drawString("1", endX, endY);
+    }
+}
+
 
     // Method to draw a filled diamond (composition)
     private void drawFilledDiamond(Graphics2D g2d, int x, int y) {
         int size = 8;
+        // Calculate the direction vector of the line
+        double dx = x - point.x;
+        double dy = y - point.y;
+
+        // Normalize the direction vector
+        double distance = Math.sqrt(dx * dx + dy * dy);
+        double unitDx = dx / distance;
+        double unitDy = dy / distance;
+
+        // Offset the diamond position slightly back from the endpoint
+        double offsetX = x - unitDx * size;
+        double offsetY = y - unitDy * size;
+
+        // Calculate the line endpoint so it stops at the diamond
+        int trimmedX = (int) offsetX;
+        int trimmedY = (int) offsetY;
+
+        // Draw the trimmed line
+        g2d.drawLine(point.x, point.y, trimmedX, trimmedY);
+
+        // Draw the filled diamond
         Path2D.Double diamond = new Path2D.Double();
-        diamond.moveTo(x, y - size); // top
-        diamond.lineTo(x + size, y); // right
-        diamond.lineTo(x, y + size); // bottom
-        diamond.lineTo(x - size, y); // left
+        diamond.moveTo(offsetX, offsetY - size); // top
+        diamond.lineTo(offsetX + size, offsetY); // right
+        diamond.lineTo(offsetX, offsetY + size); // bottom
+        diamond.lineTo(offsetX - size, offsetY); // left
         diamond.closePath();
+
+        // Fill the diamond
         g2d.setColor(Color.BLACK);
-        g2d.fill(diamond);  // Filled diamond
+        g2d.fill(diamond);
+
+        g2d.setColor(Color.BLACK); // Set text color
+        // Draw multiplicities
+        if (startMultiplicity != null && !startMultiplicity.isEmpty()) {
+            // Strip brackets if present
+            String cleanedStart = startMultiplicity.replace("[", "").replace("]", "");
+
+            // Position the start multiplicity further behind the point, opposite direction towards the diamond
+            int startX = (int) (point.x - unitDx * (size - 30)); // Move further back from the point towards the diamond
+            int startY = (int) (point.y - unitDy * (size - 30)); // Similarly adjust the Y position
+            g2d.drawString(cleanedStart, startX, startY);
+        }
+
+        if (endMultiplicity != null && !endMultiplicity.isEmpty()) {
+            // Strip brackets if present
+            String cleanedEnd = endMultiplicity.replace("[", "").replace("]", "");
+            int endX = (int) (offsetX - unitDx * (size + 10)); // Position behind the diamond
+            int endY = (int) (offsetY - unitDy * (size + 10));
+            g2d.drawString("1", endX, endY);
+        }
     }
 
     private void drawUnfilledTriangle(Graphics2D g2d, int x, int y) {
@@ -169,6 +315,7 @@ public class ClassDiagramRelationship extends UMLComponent{
 // Draw the outline of the triangle with black
         g2d.setColor(Color.BLACK);
         g2d.draw(triangle);
+
     }
 
     private Point calculateConnectionPoint(UMLComponent component, UMLComponent otherComponent) {

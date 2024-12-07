@@ -53,7 +53,7 @@ public class UMLEditorForm extends JFrame {
     JScrollPane diagramTypeScrollPane;
 
     // text area components
-    static JTextArea textArea;
+    static JTextPane textArea;
     ClassBox selectedClassBox;
     JScrollPane textAreaScrollPane;
     JPanel panelBottomEast;
@@ -173,28 +173,38 @@ public class UMLEditorForm extends JFrame {
                                         classBox.setLocation(point.x, point.y);
                                     }
                                     classBox.setPoint(((ClassBox) component).getLocation());
-                                    //classBox.updatePreferredSize();
+                                    classBox.updatePreferredSize();
                                     //workingDiagram.setupComponentForDiagram(classBox);
                                     workingDiagram.addComponents(classBox);
                                 }
                                 else if (component instanceof ClassDiagramRelationship) {
-                                    ClassBox from = null;
-                                    ClassBox to = null;
-                                    for(int i = 0; i < workingDiagram.getComponentsCount(); i++)
-                                    {
-                                        if(workingDiagram.getComponentAt(i).getName().equals(((ClassDiagramRelationship) component).getFrom().getName()))
-                                        {
-                                            from = (ClassBox) ((ClassDiagramRelationship) component).getFrom();
-                                            from.setBounds(((ClassDiagramRelationship) component).getFrom().getBounds());
-                                           // from.updatePreferredSize();
+                                    UMLComponent from = null;
+                                    UMLComponent to = null;
+                                    for (int i = 0; i < workingDiagram.getComponentsCount(); i++) {
+                                        UMLComponent current = workingDiagram.getComponentAt(i);
+                                        if (current.getName().equals(((ClassDiagramRelationship) component).getFrom().getName())) {
+                                            from = current;
                                         }
-                                        if(workingDiagram.getComponentAt(i).getName().equals(((ClassDiagramRelationship) component).getTo().getName()))
-                                        {
-                                            to = (ClassBox) ((ClassDiagramRelationship) component).getTo();
-                                            to.setBounds(((ClassDiagramRelationship) component).getTo().getBounds());
-                                           // to.updatePreferredSize();
+                                        if (current.getName().equals(((ClassDiagramRelationship) component).getTo().getName())) {
+                                            to = current;
                                         }
                                     }
+
+//                                    for(int i = 0; i < workingDiagram.getComponentsCount(); i++)
+//                                    {
+//                                        if(workingDiagram.getComponentAt(i).getName().equals(((ClassDiagramRelationship) component).getFrom().getName()))
+//                                        {
+//                                            from = (ClassBox) ((ClassDiagramRelationship) component).getFrom();
+//                                            from.setBounds(((ClassDiagramRelationship) component).getFrom().getBounds());
+//                                            from.updatePreferredSize();
+//                                        }
+//                                        if(workingDiagram.getComponentAt(i).getName().equals(((ClassDiagramRelationship) component).getTo().getName()))
+//                                        {
+//                                            to = (ClassBox) ((ClassDiagramRelationship) component).getTo();
+//                                            to.setBounds(((ClassDiagramRelationship) component).getTo().getBounds());
+//                                            to.updatePreferredSize();
+//                                        }
+//                                    }
 //                                    ClassBox from = (ClassBox)(((ClassDiagramRelationship) component).getFrom());
 //
 //                                    ClassBox to = (ClassBox)(((ClassDiagramRelationship) component).getTo());
@@ -396,7 +406,7 @@ public class UMLEditorForm extends JFrame {
         panelTopEast.add(diagramTypeScrollPane);
 
         // initialize text area
-        textArea = new JTextArea();
+        textArea = new JTextPane();
         textArea.setText("Add diagram notes");
         textArea.setPreferredSize(new Dimension(500,500));
 
@@ -699,7 +709,7 @@ public class UMLEditorForm extends JFrame {
         selectedClassBox = classBox;
 
     }
-    public static JTextArea getTextArea()
+    public static JTextPane getTextArea()
     {
         return textArea;
     }

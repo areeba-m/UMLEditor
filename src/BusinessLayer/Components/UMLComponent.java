@@ -46,7 +46,7 @@ public abstract class UMLComponent extends JComponent {
     protected boolean isGridPanel = false;
     protected boolean isDropped = false;
     @JsonIgnore
-    protected static JTextArea textArea;
+    protected static JTextPane textArea;
 
     public UMLComponent() {
 
@@ -67,6 +67,10 @@ public abstract class UMLComponent extends JComponent {
 
                 if(UMLComponent.this instanceof ClassBox obj) {
                     obj.handleClassBoxMousePressed(e);
+                }
+                else if(UMLComponent.this instanceof ClassDiagramRelationship obj)
+                {
+                    obj.handleMousePressed();
                 }
                 else{
                     // class box specifically sets its own text
@@ -169,7 +173,7 @@ public abstract class UMLComponent extends JComponent {
         repaint();
     }
 
-    public void setTextArea(JTextArea txtArea)
+    public void setTextArea(JTextPane txtArea)
     {
         this.textArea = txtArea;
     }
