@@ -1,6 +1,7 @@
 package BusinessLayer.Components.ClassDiagramComponents;
 
 import BusinessLayer.Components.UMLComponent;
+import org.json.JSONObject;
 
 
 import javax.swing.*;
@@ -58,6 +59,7 @@ public class ClassDiagramRelationship extends UMLComponent{
 
             // **Force initial bounds calculation**
             updateBounds();
+            revalidate();
             repaint(); // Ensure the component is drawn immediately
         }
     }
@@ -77,6 +79,7 @@ public class ClassDiagramRelationship extends UMLComponent{
         super.paintComponent(g);
         Graphics2D g2d = (Graphics2D) g;
 
+        System.out.println("Paint called for ClassDiagramRelationship type " +this.name);
         // Set the color and stroke for the line
         g2d.setColor(Color.BLACK);
         g2d.setStroke(new BasicStroke(2));
@@ -85,15 +88,24 @@ public class ClassDiagramRelationship extends UMLComponent{
         point = calculateConnectionPoint(from, to);
         endPoint = calculateConnectionPoint(to, from);
 
-        g2d.drawLine(point.x, point.y, endPoint.x, endPoint.y);
+       //g2d.drawLine(point.x, point.y, endPoint.x, endPoint.y);
 
         // Draw the relationship-specific symbols at the end
         if (name.equalsIgnoreCase("aggregation")) {
-            drawHollowDiamond(g2d, endPoint.x + 8, endPoint.y);
+            endPoint.setLocation(endPoint.x-10, endPoint.y -10);
+            g2d.drawLine(point.x, point.y, endPoint.x, endPoint.y);
+            drawHollowDiamond(g2d, endPoint.x, endPoint.y);
         } else if (name.equalsIgnoreCase("composition")) {
-            drawFilledDiamond(g2d, endPoint.x + 8, endPoint.y);
+            endPoint.setLocation(endPoint.x- 10, endPoint.y -10);
+            g2d.drawLine(point.x, point.y, endPoint.x, endPoint.y);
+            drawFilledDiamond(g2d, endPoint.x, endPoint.y);
         } else if (name.equalsIgnoreCase("inheritance")) {
-            drawUnfilledTriangle(g2d, endPoint.x + 13, endPoint.y);
+            //endPoint.setLocation(endPoint.x-10, endPoint.y-10)
+            g2d.drawLine(point.x, point.y, endPoint.x, endPoint.y);
+            drawUnfilledTriangle(g2d, endPoint.x, endPoint.y);
+        }
+        else {
+            g2d.drawLine(point.x, point.y, endPoint.x, endPoint.y);
         }
 
         if (isSelected()) {
@@ -106,20 +118,24 @@ public class ClassDiagramRelationship extends UMLComponent{
 
     // Method to draw a hollow diamond (aggregation)
     private void drawHollowDiamond(Graphics2D g2d, int x, int y) {
-        int size = 10;
+        int size = 8;
         Path2D.Double diamond = new Path2D.Double();
         diamond.moveTo(x, y - size); // top
         diamond.lineTo(x + size, y); // right
         diamond.lineTo(x, y + size); // bottom
         diamond.lineTo(x - size, y); // left
         diamond.closePath();
+        g2d.setColor(Color.WHITE);
+        g2d.fill(diamond);
+
+// Draw the outline of the triangle with black
         g2d.setColor(Color.BLACK);
-        g2d.draw(diamond);  // Hollow diamond (just outline)
+        g2d.draw(diamond);
     }
 
     // Method to draw a filled diamond (composition)
     private void drawFilledDiamond(Graphics2D g2d, int x, int y) {
-        int size = 10;
+        int size = 8;
         Path2D.Double diamond = new Path2D.Double();
         diamond.moveTo(x, y - size); // top
         diamond.lineTo(x + size, y); // right
@@ -147,8 +163,12 @@ public class ClassDiagramRelationship extends UMLComponent{
         triangle.lineTo(x2, y2);
         triangle.closePath();
 
+        g2d.setColor(Color.WHITE);
+        g2d.fill(triangle);
+
+// Draw the outline of the triangle with black
         g2d.setColor(Color.BLACK);
-        g2d.draw(triangle);  // Outline of triangle
+        g2d.draw(triangle);
     }
 
     private Point calculateConnectionPoint(UMLComponent component, UMLComponent otherComponent) {
@@ -184,7 +204,7 @@ public class ClassDiagramRelationship extends UMLComponent{
         return new Point(edgeX - getX(), edgeY - getY());
     }
 
-    private void updateBounds() {
+    public void updateBounds() {
         if (from == null || to == null) {
             int x = Math.min(point.x, endPoint.x) - 10; // Add padding for x
             int y = Math.min(point.y, endPoint.y) - 10; // Add padding for y
@@ -207,6 +227,8 @@ public class ClassDiagramRelationship extends UMLComponent{
 
         // Update this component's bounds
         setBounds(x, y, width, height);
+        revalidate();
+        repaint();
     }
 
     public UMLComponent getFrom() {
@@ -232,5 +254,81 @@ public class ClassDiagramRelationship extends UMLComponent{
     @Override
     public void setAttributes(List<Object> attributes) {
 
+    }
+
+    public JSONObject toJSON() {
+        JSONObject json = new JSONObject();
+
+        // Serialize inherited attributes
+        json.put("type", "ClassDiagramRelationship");
+        json.put("name", this.name);
+
+        // Serialize the point (location)
+        json.put("point", new JSONObject()
+                .put("x", this.point.x)
+                .put("y", this.point.y));
+        json.put("endPoint", new JSONObject()
+                .put("x", this.endPoint.x)
+                .put("y", this.endPoint.y));
+
+        // Serialize 'from' and 'to' components
+        if (from != null) {
+            json.put("from", from.toJSON());
+        }
+        if (to != null) {
+            json.put("to", to.toJSON());
+        }
+        // Serialize the bounds
+        Rectangle bounds = this.getBounds(); // Assuming getBounds() is implemented
+        json.put("bounds", new JSONObject()
+                .put("x", bounds.x)
+                .put("y", bounds.y)
+                .put("width", bounds.width)
+                .put("height", bounds.height));
+
+        json.put("location", new JSONObject()
+                .put("x", this.getLocation().x)
+                .put("y", this.getLocation().y));
+
+        // Return the JSON object
+        return json;
+    }
+
+    public void setEndPoint(Point point) {
+        if(endPoint != null)
+        {
+            endPoint.setLocation(point.getLocation());
+        }
+        else {
+            endPoint = new Point(point);
+        }
+        updateBounds();
+    }
+    public void setPoint(Point point) {
+        if(this.point != null)
+        {
+            this.point.setLocation(point.getLocation());
+        }
+        else {
+            this.point = new Point(point);
+        }
+        updateBounds();
+    }
+    public Point getEndPoint()
+    {
+        return endPoint;
+    }
+    public Point getPoint()
+    {
+        return point;
+    }
+    public void setFrom(ClassBox fromBox) {
+        this.from = fromBox;
+        this.from.setBounds(fromBox.getPoint().x, fromBox.getPoint().y,fromBox.getPreferredSize().width, fromBox.getPreferredSize().height);
+    }
+
+    public void setTo(ClassBox classBox) {
+        this.to = classBox;
+        this.to.setBounds(classBox.getPoint().x, classBox.getPoint().y,classBox.getPreferredSize().width, classBox.getPreferredSize().height);
     }
 }

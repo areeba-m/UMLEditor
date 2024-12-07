@@ -2,6 +2,7 @@ package BusinessLayer.Components.ClassDiagramComponents;
 
 import BusinessLayer.Components.UMLComponent;
 import BusinessLayer.Diagrams.UMLDiagram;
+import org.json.JSONObject;
 
 import java.awt.*;
 import java.awt.geom.Path2D;
@@ -93,5 +94,10 @@ public class Inheritence extends UMLComponent {
     @Override
     public void setAttributes(List<Object> attributes) {
 
+    }
+
+    @Override
+    public JSONObject toJSON() {
+        return null;
     }
 }

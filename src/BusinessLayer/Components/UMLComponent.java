@@ -2,8 +2,10 @@ package BusinessLayer.Components;
 
 import BusinessLayer.Components.ClassDiagramComponents.ClassBox;
 import BusinessLayer.Components.ClassDiagramComponents.ClassDiagramRelationship;
+import BusinessLayer.Components.UseCaseDiagramComponents.UseCaseDiagramRelationship;
 import BusinessLayer.Diagrams.ClassDiagram;
 import BusinessLayer.Diagrams.UMLDiagram;
+import org.json.JSONObject;
 import ui.UMLEditorForm;
 import BusinessLayer.Components.ClassDiagramComponents.ClassBox;
 import javax.swing.*;
@@ -101,7 +103,7 @@ public abstract class UMLComponent extends JComponent {
             @Override
             public void mouseDragged(MouseEvent e) {
 
-                if(UMLComponent.this instanceof  UseCaseDiagramRelationship ||
+                if(UMLComponent.this instanceof UseCaseDiagramRelationship ||
                         UMLComponent.this instanceof ClassDiagramRelationship){
                     return;
                 }
@@ -218,4 +220,6 @@ public abstract class UMLComponent extends JComponent {
     public void addMethods(String[] meth) {
 
     }
+
+    public abstract JSONObject toJSON();
 }

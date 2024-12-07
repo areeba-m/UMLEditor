@@ -10,13 +10,17 @@ import BusinessLayer.Diagrams.ClassDiagram;
 import BusinessLayer.Diagrams.UMLDiagram;
 import BusinessLayer.Diagrams.UseCaseDiagram;
 
+import java.awt.image.BufferedImage;
 import java.io.*;
 import java.util.ArrayList;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import javax.imageio.ImageIO;
 import javax.swing.*;
+import javax.swing.plaf.FontUIResource;
 import java.awt.*;
 import java.awt.event.*;
+import java.util.Enumeration;
 
 public class UMLEditorForm extends JFrame {
 
@@ -76,13 +80,24 @@ public class UMLEditorForm extends JFrame {
         prepareCanvas(diagram);
         loadGrid();
 
+        exportPng.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                exportPanelAsPNG(workingDiagram);
+            }
+        });
+        exportJpeg.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                exportPanelAsJPEG(workingDiagram);
+            }
+        });
+
         btnUpdate.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                for(int i = 0; i < workingDiagram.getComponentsCount(); i++)
-                {
-                    if(workingDiagram.getComponentAt(i).isSelected())
-                    {
+                for (int i = 0; i < workingDiagram.getComponentsCount(); i++) {
+                    if (workingDiagram.getComponentAt(i).isSelected()) {
                         workingDiagram.getComponentAt(i).updateFromTextArea();
                         workingDiagram.getComponentAt(i).setSelected(false);
                         workingDiagram.repaint();
@@ -91,10 +106,189 @@ public class UMLEditorForm extends JFrame {
                 }
             }
         });
+        saveProject.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                JFileChooser fileChooser = new JFileChooser();
+                fileChooser.setDialogTitle("Save Project");
+                int userSelection = fileChooser.showSaveDialog(UMLEditorForm.this);
+
+                if (userSelection == JFileChooser.APPROVE_OPTION) {
+                    String fileName = fileChooser.getSelectedFile().toString();
+                    if (!fileName.endsWith(".json")) {
+                        fileName += ".json";
+                    }
+                    try {
+                        workingDiagram.saveToFile(fileName);
+                        JOptionPane.showMessageDialog(UMLEditorForm.this, "Project saved successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
+                    } catch (Exception ex) {
+                        JOptionPane.showMessageDialog(UMLEditorForm.this, "Failed to save the project: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                    }
+                }
+            }
+        });
+
+        loadProject.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                JFileChooser fileChooser = new JFileChooser();
+                fileChooser.setDialogTitle("Load Project");
+                int userSelection = fileChooser.showSaveDialog(UMLEditorForm.this);
+
+                if (userSelection == JFileChooser.APPROVE_OPTION) {
+                    String fileName = fileChooser.getSelectedFile().toString();
+                    if (!fileName.endsWith(".json")) {
+                        fileName += ".json";
+                    }
+                    try {
+                        UMLDiagram diagram = workingDiagram.loadFromFile(fileName);
+                        // Check if the loaded diagram is a ClassDiagram
+                        if (diagram instanceof ClassDiagram) {
+                            // If it is a ClassDiagram, populate workingDiagram
+                            workingDiagram = (ClassDiagram) diagram;
+                            String name = workingDiagram.getName();
+                            // Initialize the ClassBox components for the workingDiagram
+                            ArrayList<UMLComponent> components = workingDiagram.getListOfComponents();
+                            workingDiagram = new ClassDiagram();
+                            workingDiagram.setName(name);
+                            // Assuming UMLDiagram has a getComponents method
+                            for (UMLComponent component : components) {
+                                if (component instanceof ClassBox) {
+                                    ClassBox classBox = new ClassBox();
+                                    classBox.setName(component.getName());
+                                    classBox.setType(component.getType());
+                                    classBox.setHeight(component.getHeight());
+                                    classBox.setWidth(component.getWidth());
+                                    classBox.setAttributes(((ClassBox) component).getAttributes());
+                                    classBox.setMethods(((ClassBox) component).getMethods());
+                                    classBox.setSelected(false);
+
+                                    if (component.getBounds() != null) {
+                                        classBox.setBounds(component.getBounds());
+                                    }
+                                    if (component.getBounds() != null) {
+                                        classBox.setLocation(component.getBounds().x, component.getBounds().y);
+                                    } else if (component instanceof ClassBox) {
+                                        Point point = ((ClassBox) component).getPoint();
+                                        classBox.setLocation(point.x, point.y);
+                                    }
+                                    classBox.setPoint(((ClassBox) component).getLocation());
+                                    //classBox.updatePreferredSize();
+                                    //workingDiagram.setupComponentForDiagram(classBox);
+                                    workingDiagram.addComponents(classBox);
+                                }
+                                else if (component instanceof ClassDiagramRelationship) {
+                                    ClassBox from = null;
+                                    ClassBox to = null;
+                                    for(int i = 0; i < workingDiagram.getComponentsCount(); i++)
+                                    {
+                                        if(workingDiagram.getComponentAt(i).getName().equals(((ClassDiagramRelationship) component).getFrom().getName()))
+                                        {
+                                            from = (ClassBox) ((ClassDiagramRelationship) component).getFrom();
+                                            from.setBounds(((ClassDiagramRelationship) component).getFrom().getBounds());
+                                        }
+                                        if(workingDiagram.getComponentAt(i).getName().equals(((ClassDiagramRelationship) component).getTo().getName()))
+                                        {
+                                            to = (ClassBox) ((ClassDiagramRelationship) component).getTo();
+                                            to.setBounds(((ClassDiagramRelationship) component).getTo().getBounds());
+                                        }
+                                    }
+//                                    ClassBox from = (ClassBox)(((ClassDiagramRelationship) component).getFrom());
+//
+//                                    ClassBox to = (ClassBox)(((ClassDiagramRelationship) component).getTo());
+                                     String relationshipName = component.getName();
+//                                   // Point start = new Point(((ClassDiagramRelationship) component).getPoint());
+//                                   // Point end = new Point(((ClassDiagramRelationship) component).getEndPoint());
+//                                    // Create the relationship using the constructor
+                                     ClassDiagramRelationship relationship = new ClassDiagramRelationship(from, to, relationshipName);
+//
+//                                    // Set other properties
+                                     relationship.setPoint(((ClassDiagramRelationship) component).getPoint());
+                                     relationship.setEndPoint(((ClassDiagramRelationship) component).getEndPoint());
+//
+//                                    if (component.getBounds() != null) {
+//                                        relationship.setBounds(component.getBounds());
+//                                    }
+//////                                    // Set the location for the relationship
+//                                        if (component.getBounds() != null) {
+//                                        relationship.setLocation(component.getBounds().x, component.getBounds().y);
+//                                    }
+                                    relationship.updateBounds();
+                                    workingDiagram.addComponents(relationship);
+
+                                }
+                            }
+                            prepareCanvas(workingDiagram);
+                            JOptionPane.showMessageDialog(UMLEditorForm.this, "Project loaded successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
+                        } else if (diagram instanceof UseCaseDiagram) {
+                            // Cast the loaded diagram to UseCaseDiagram
+                            workingDiagram = (UseCaseDiagram) diagram;
+                            String name = workingDiagram.getName();
+
+                            // Initialize the UseCaseDiagram with the loaded components
+                            ArrayList<UMLComponent> components = workingDiagram.getListOfComponents();
+                            workingDiagram = new UseCaseDiagram();
+                            workingDiagram.setName(name);
+
+                            for (UMLComponent component : components) {
+                                if (component instanceof Actor) {
+                                    // Populate Actor components
+                                    Actor actor = new Actor(component.getName());
+                                    actor.setBounds(component.getBounds());
+                                    actor.setLocation(component.getBounds().x, component.getBounds().y);
+                                    workingDiagram.addComponents(actor);
+                                } else if (component instanceof UseCase) {
+                                    // Populate UseCase components
+                                    UseCase useCase = new UseCase(component.getName());
+                                    useCase.setBounds(component.getBounds());
+                                    useCase.setLocation(component.getBounds().x, component.getBounds().y);
+                                    workingDiagram.addComponents(useCase);
+                                } else if (component instanceof UseCaseDiagramRelationship) {
+                                    // Populate relationships
+                                    UMLComponent fromComponent = null;
+                                    UMLComponent toComponent = null;
+
+                                    // Find `from` and `to` components by name in the existing diagram
+                                    for (int i = 0; i < workingDiagram.getComponentsCount(); i++) {
+                                        UMLComponent current = workingDiagram.getComponentAt(i);
+                                        if (current.getName().equals(((UseCaseDiagramRelationship) component).getFrom().getName())) {
+                                            fromComponent = current;
+                                        }
+                                        if (current.getName().equals(((UseCaseDiagramRelationship) component).getTo().getName())) {
+                                            toComponent = current;
+                                        }
+                                    }
+
+                                    // Create the relationship
+                                    if (fromComponent != null && toComponent != null) {
+                                        UseCaseDiagramRelationship relationship = new UseCaseDiagramRelationship(fromComponent, toComponent, component.getName());
+                                        relationship.setName(component.getName());
+                                        relationship.setLabel(((UseCaseDiagramRelationship) component).getLabel());
+                                        relationship.setBounds(component.getBounds());
+                                        relationship.setStartPoint(((UseCaseDiagramRelationship) component).getStartPoint());
+                                        relationship.setEndPoint(((UseCaseDiagramRelationship) component).getEndPoint());
+                                        relationship.updateBounds();
+                                        workingDiagram.addComponents(relationship);
+                                    }
+                                }
+                            }
+
+                            prepareCanvas(workingDiagram);
+                            JOptionPane.showMessageDialog(UMLEditorForm.this, "Use Case Diagram loaded successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
+                        }
+                        else {
+                            JOptionPane.showMessageDialog(UMLEditorForm.this, "The loaded file is not a Class Diagram.", "Error", JOptionPane.ERROR_MESSAGE);
+                        }
+                    } catch (Exception ex) {
+                        JOptionPane.showMessageDialog(UMLEditorForm.this, "Failed to save the project: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                    }
+                }
+            }
+        });
         pack();
     }
 
-    private void prepareMenuBar(){
+    private void prepareMenuBar() {
 
         menuBar = new JMenuBar();
 
@@ -231,12 +425,12 @@ public class UMLEditorForm extends JFrame {
     }
 
     public static void setUIFont(Font font) {
-        java.util.Enumeration<Object> keys = UIManager.getDefaults().keys();
+        Enumeration<Object> keys = UIManager.getDefaults().keys();
         while (keys.hasMoreElements()) {
             Object key = keys.nextElement();
             Object value = UIManager.get(key);
-            if (value instanceof javax.swing.plaf.FontUIResource) {
-                UIManager.put(key, new javax.swing.plaf.FontUIResource(font));
+            if (value instanceof FontUIResource) {
+                UIManager.put(key, new FontUIResource(font));
             }
         }
     }
@@ -262,35 +456,35 @@ public class UMLEditorForm extends JFrame {
             }
             int startX = 10;
             int startY = 10;
-            int offsetX = 55;
-            int offsetY = 50;
+            int offsetX = 190;
+            int offsetY = 140;
 
             // Create and position each ClassBox
             ClassBox simpleClass = new ClassBox();
             simpleClass.setName("SimpleClass");
             simpleClass.setType("simple");
-            simpleClass.getPoint().setLocation(startX, startY);
+            //simpleClass.getPoint().setLocation(startX, startY);
             simpleClass.setIsGridPanel(true);
             simpleClass.setSelected(false);
 
             ClassBox concreteClass = new ClassBox();
             concreteClass.setName("ConcreteClass");
             concreteClass.setType("simple");
-            concreteClass.getPoint().setLocation(startX, startY);
+            //concreteClass.getPoint().setLocation(startX+offsetX, startY+offsetY);
             concreteClass.setIsGridPanel(true);
             concreteClass.setSelected(false);
 
             ClassBox abstractClass = new ClassBox();
             abstractClass.setName("AbstractClass");
             abstractClass.setType("Abstract");
-            abstractClass.getPoint().setLocation(startX + offsetX, startY);
+            //abstractClass.getPoint().setLocation(startX + offsetX, startY);
             abstractClass.setIsGridPanel(true);
             abstractClass.setSelected(false);
 
             ClassBox interfaceClass = new ClassBox();
             interfaceClass.setName("Class");
             interfaceClass.setType("Interface");
-            interfaceClass.getPoint().setLocation(startX, startY + offsetY);
+            //interfaceClass.getPoint().setLocation(startX, startY + offsetY);
             interfaceClass.setIsGridPanel(true);
             interfaceClass.setSelected(false);
 
@@ -327,10 +521,10 @@ public class UMLEditorForm extends JFrame {
             inheritance.setSelected(false);
             inheritance.setIsGridPanel(true);
 
-            simpleClass.setBounds(10, 10, 200, 200);
-            abstractClass.setBounds(200, 10, 200, 200);
-            interfaceClass.setBounds(10, 150, 200, 200);
-            concreteClass.setBounds(200, 150, 200, 200);
+            simpleClass.setBounds(10, 10, 100, 70);
+            abstractClass.setBounds(200, 10, 100, 70);
+            interfaceClass.setBounds(10, 150, 100, 100);
+            concreteClass.setBounds(200, 150, 100, 70);
 
             setupComponentForGrid(simpleClass);
             setupComponentForGrid(abstractClass);
@@ -341,10 +535,10 @@ public class UMLEditorForm extends JFrame {
             panelGrid.add(abstractClass);
             panelGrid.add(interfaceClass);
             panelGrid.add(concreteClass);
-            panelGrid.add(inheritance);
-            panelGrid.add(association);
-            panelGrid.add(aggregation);
-            panelGrid.add(composition);
+//            panelGrid.add(inheritance);
+//            panelGrid.add(association);
+//            panelGrid.add(aggregation);
+//            panelGrid.add(composition);
 
         } else if ("UML Use Case".equals(diagramType)) {
             if (!(workingDiagram instanceof UseCaseDiagram)) {
@@ -400,11 +594,12 @@ public class UMLEditorForm extends JFrame {
                         newComponent.setType(component.getType());
                         newComponent.setIsDropped(true);//component is now dropped to the canvas
                         newComponent.setSelected(false);
+                        newComponent.setIsGridPanel(false);
                     }
                     else if(component instanceof ClassDiagramRelationship)
                     {
-                        //Point end = new Point((int) (e.getPoint().getX() + 30), (int) (e.getPoint().getY()+0));
-                        //newComponent = new ClassDiagramRelationship(e.getPoint(), end);
+//                        Point end = new Point((int) (e.getPoint().getX() + 30), (int) (e.getPoint().getY()+0));
+//                        newComponent = new ClassDiagramRelationship(e.getPoint(), end);
                     } else if (component instanceof Actor) {
                         newComponent = new Actor(component.getName());
                     } else if (component instanceof UseCase) {
@@ -412,7 +607,7 @@ public class UMLEditorForm extends JFrame {
                     } else if (component instanceof UseCaseDiagramRelationship) {
                         // newComponent = new UseCaseDiagramRelationship(null,null,component.getName());
                     }
-                    //workingDiagram.setupComponentForDiagram(newComponent); // Set drag listeners
+//                    workingDiagram.setupComponentForDiagram(newComponent); // Set drag listeners
                     component.setSelected(false); // panel grid component should not show as selected
                     workingDiagram.addComponent(newComponent);
 
@@ -423,6 +618,77 @@ public class UMLEditorForm extends JFrame {
         });
     }
 
+    private void exportPanelAsPNG(JPanel panel) {
+        for(int i = 0; i < workingDiagram.getComponentsCount(); i++)
+        {
+            workingDiagram.getListOfComponents().get(i).setSelected(false);
+        }
+        // Create a JFileChooser to allow the user to select the file location and name
+        JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setDialogTitle("Save Diagram as PNG");
+        fileChooser.setSelectedFile(new File("working_diagram.png"));  // Default file name
+
+        // Show the save dialog and check if the user selected a file
+        int userSelection = fileChooser.showSaveDialog(this);
+        if (userSelection == JFileChooser.APPROVE_OPTION) {
+            // Get the file the user selected
+            File fileToSave = fileChooser.getSelectedFile();
+
+            // Make sure the file has a ".png" extension
+            String filePath = fileToSave.getAbsolutePath();
+            if (!filePath.endsWith(".png")) {
+                filePath += ".png";
+            }
+
+            // Create a BufferedImage to hold the panel content
+            BufferedImage image = new BufferedImage(panel.getWidth(), panel.getHeight(), BufferedImage.TYPE_INT_ARGB);
+
+            // Paint the panel's content onto the BufferedImage
+            Graphics2D g2d = image.createGraphics();
+            panel.paint(g2d);  // Use paint() to include all the contents of the panel
+            g2d.dispose();
+
+            try {
+                // Write the BufferedImage to the selected PNG file
+                ImageIO.write(image, "png", new File(filePath));
+                JOptionPane.showMessageDialog(this, "Diagram exported successfully to " + filePath);
+            } catch (Exception e) {
+                e.printStackTrace();
+                JOptionPane.showMessageDialog(this, "Failed to export diagram.");
+            }
+        }
+    }
+    private void exportPanelAsJPEG(JPanel panel) {
+        for(int i = 0; i < workingDiagram.getComponentsCount(); i++)
+        {
+            workingDiagram.getListOfComponents().get(i).setSelected(false);
+        }
+        JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setDialogTitle("Save Diagram as JPEG");
+        fileChooser.setSelectedFile(new File("working_diagram.jpeg")); // Default file name
+
+        int userSelection = fileChooser.showSaveDialog(this);
+        if (userSelection == JFileChooser.APPROVE_OPTION) {
+            File fileToSave = fileChooser.getSelectedFile();
+            String filePath = fileToSave.getAbsolutePath();
+            if (!filePath.endsWith(".jpeg") && !filePath.endsWith(".jpg")) {
+                filePath += ".jpeg";
+            }
+
+            BufferedImage image = new BufferedImage(panel.getWidth(), panel.getHeight(), BufferedImage.TYPE_INT_RGB);
+            Graphics2D g2d = image.createGraphics();
+            panel.paint(g2d);
+            g2d.dispose();
+
+            try {
+                ImageIO.write(image, "jpeg", new File(filePath));
+                JOptionPane.showMessageDialog(this, "Diagram exported successfully to " + filePath);
+            } catch (Exception e) {
+                e.printStackTrace();
+                JOptionPane.showMessageDialog(this, "Failed to export diagram.");
+            }
+        }
+    }
     public static void main(String[] args){
         UMLEditorForm app = new UMLEditorForm();
         app.setVisible(true);

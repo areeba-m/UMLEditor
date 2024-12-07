@@ -38,7 +38,7 @@ public class ClassBox extends UMLComponent {
 
     public ClassBox()
     {
-        setPreferredSize(new Dimension(200,200));
+        //setPreferredSize(new Dimension(200,200));
 
         this.point = new Point(0,0);
         this.name = "";
@@ -86,61 +86,6 @@ public class ClassBox extends UMLComponent {
         // Repaint to reflect changes
         repaint();
     }
-//    public ClassBox(String name, String type)
-//    {
-//        this.point = new Point(0,0);
-//        this.name = name;
-//        this.classType = type;
-//        this.attributes = new ArrayList<>();
-//        this.methods = new ArrayList<>();
-//        isGridPanel = false;
-//
-////        addMouseListener(new MouseAdapter() {
-////            @Override
-////            public void mousePressed(MouseEvent e) {
-////            }
-////        });
-//    }
-//
-    public void handleClassBoxPressed(MouseEvent e)
-    {
-        //when the classbox is selected set isSelected to true to identify it in the form
-        setSelected(true);
-        // Check if the click is inside this ClassBox
-            // Pass this ClassBox to UMLEditorForm so that it can update its attributes and methods
-            //form.setSelectedClassBox(ClassBox.this);
-            // Call updateTextArea method when clicked
-//            if(isDropped) {
-//                String text = name + "\n";
-//                text += "----------------------------------------------------" + "\n";
-//                for (int i = 0; i < attributes.size(); i++) {
-//                    text += "- ";
-//                    text += attributes.get(i);
-//                    text += "\n";
-//                }
-//                text += "----------------------------------------------------" + "\n";
-//                for (int i = 0; i < methods.size(); i++) {
-//                    text += "- ";
-//                    text += methods.get(i);
-//                    text += "\n";
-//                }
-//                text += "----------------------------------------------------" + "\n";
-//                updater.updateTextArea(text);
-//                return true;
-//            }
-//            return false;
-    }
-//    // Check if the mouse click is inside this ClassBox
-//    public boolean isClicked(Point point) {
-//        Rectangle bounds = getBounds();  // Get the bounding rectangle of the class box
-//        return bounds.contains(point);  // Check if the click point is within the box
-//    }
-//
-//    // Perform the desired action when the ClassBox is clicked
-//    public void handleClick() {
-//        // Call the updateTextArea method to update the UI (in this case, set class name in the text area)
-//        //updater.updateTextArea();
-//    }.
 
     public boolean checkAttributePresence(String value)
     {
@@ -176,6 +121,7 @@ public class ClassBox extends UMLComponent {
         updatePreferredSize();
         // Update bounds to avoid rendering issues
         setBounds(getX(), getY(), getPreferredSize().width, getPreferredSize().height);
+        //point.setLocation(getX(), getY());
         System.out.println("Height: "+height+", width: "+width);
 //        revalidate();
 //        repaint();
@@ -192,6 +138,7 @@ public class ClassBox extends UMLComponent {
          updatePreferredSize();
          // Update bounds to avoid rendering issues
          setBounds(getX(), getY(), getPreferredSize().width, getPreferredSize().height);
+         //point.setLocation(getX(), getY());
          System.out.println("Height: "+height+", width: "+width);
 //         revalidate();
 //         repaint();
@@ -241,7 +188,9 @@ public class ClassBox extends UMLComponent {
             text += "-";
         }
         text += "\n";
-        text += "\n";
+        if(attributes.size() <= 0) {
+            text += "\n";
+        }
         for(int i = 0; i < attributes.size(); i++)
         {
             text += attributes.get(i);
@@ -261,11 +210,10 @@ public class ClassBox extends UMLComponent {
         textArea.removeAll();
         textArea.setText(text);
 
-        // Update bounds to avoid rendering issues
-        setBounds(getX(), getY(), getPreferredSize().width, getPreferredSize().height);
-
-        // Repaint parent to clear artifacts
-        getParent().repaint();
+            // Update bounds to avoid rendering issues
+            setBounds(getX(), getY(), getPreferredSize().width, getPreferredSize().height);
+            // Repaint parent to clear artifacts
+            getParent().repaint();
     }
     public void handleClassBoxMouseReleased(MouseEvent e)
     {
@@ -279,10 +227,8 @@ public class ClassBox extends UMLComponent {
 
             // Update location
             setLocation(currentLocation.x + deltaX, currentLocation.y + deltaY);
-
             // Update bounds to avoid rendering issues
             setBounds(getX(), getY(), getPreferredSize().width, getPreferredSize().height);
-
             // Repaint parent to clear artifacts
             getParent().repaint();
         }
@@ -315,6 +261,16 @@ public class ClassBox extends UMLComponent {
             }
         }
     }
+
+    public ArrayList<String> getAttributes()
+    {
+        return attributes;
+    }
+    public ArrayList<String> getMethods()
+    {
+        return methods;
+    }
+
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
@@ -323,6 +279,7 @@ public class ClassBox extends UMLComponent {
         // Set the rendering hints for better text and graphics quality
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
+        System.out.println(point.getLocation());
         // Define padding and box dimensions
         int x = (int)point.getX();
         int y = (int)point.getY();
@@ -334,34 +291,8 @@ public class ClassBox extends UMLComponent {
 
 // Get FontMetrics for measuring string widths
             FontMetrics metrics = g2d.getFontMetrics(g2d.getFont());
-//
-//// Determine the longest string among attributes, methods, and class name
-//            String longestString = name; // Start with the class name
-//            for (String attribute : attributes) {
-//                if (metrics.stringWidth(attribute) > metrics.stringWidth(longestString)) {
-//                    longestString = attribute;
-//                }
-//            }
-//            for (String method : methods) {
-//                if (metrics.stringWidth(method) > metrics.stringWidth(longestString)) {
-//                    longestString = method;
-//                }
-//            }
-//
-//// Calculate the width based on the longest string
-//            int textWidth2 = metrics.stringWidth(longestString);
-//            boxWidth = Math.max(boxWidth, textWidth2 + padding * 2); // Add padding for margins
-//
-//            // Adjust box height based on attributes and methods (if needed)
-//            int attributeSectionHeight = 20 * attributes.size();
-//            int methodSectionHeight = 20 * methods.size();
-//            boxHeight = 50 + attributeSectionHeight + methodSectionHeight + 40;
-//
-//
-//            setPreferredSize(new Dimension(boxWidth, boxHeight));
-//            revalidate();
-//
-            System.out.println("height: "+ boxHeight+ ", width: "+boxWidth);
+
+            //System.out.println("height: "+ boxHeight+ ", width: "+boxWidth);
 
             // Set up drawing starting coordinates for the box
             x = (int) point.getX();
@@ -369,9 +300,6 @@ public class ClassBox extends UMLComponent {
 
             // Draw the class box
             g2d.drawRect(x, y, boxWidth, boxHeight);
-
-            // Get font metrics for centering text
-            //FontMetrics metrics = g2d.getFontMetrics(g2d.getFont());
 
             // Draw "<<Interface>>" centered in the upper part of the box
             String classHeader = "<<Interface>>";
@@ -422,34 +350,8 @@ public class ClassBox extends UMLComponent {
 
 // Get FontMetrics for measuring string widths
             FontMetrics metrics = g2d.getFontMetrics(g2d.getFont());
-//
-//// Determine the longest string among attributes, methods, and class name
-//            String longestString = name; // Start with the class name
-//            for (String attribute : attributes) {
-//                if (metrics.stringWidth(attribute) > metrics.stringWidth(longestString)) {
-//                    longestString = attribute;
-//                }
-//            }
-//            for (String method : methods) {
-//                if (metrics.stringWidth(method) > metrics.stringWidth(longestString)) {
-//                    longestString = method;
-//                }
-//            }
-//
-//// Calculate the width based on the longest string
-//            int textWidth2 = metrics.stringWidth(longestString);
-//            boxWidth = Math.max(boxWidth, textWidth2 + padding * 2); // Add padding for margins
-//
-//// Adjust height based on attributes and methods
-//            int attributeSectionHeight = 20 * attributes.size();
-//            int methodSectionHeight = 20 * methods.size();
-//            boxHeight = 50 + attributeSectionHeight + methodSectionHeight + 40;
-//
-//
-//            setPreferredSize(new Dimension(boxWidth, boxHeight));
-//            revalidate();
-//
-            System.out.println("height: "+ boxHeight+ ", width: "+boxWidth);
+
+           // System.out.println("height: "+ boxHeight+ ", width: "+boxWidth);
 
 // Set up drawing starting coordinates for the box
             x = (int) point.getX();
@@ -508,33 +410,6 @@ public class ClassBox extends UMLComponent {
 
 // Get FontMetrics for measuring string widths
             FontMetrics metrics = g2d.getFontMetrics(g2d.getFont());
-//
-//// Determine the longest string among attributes, methods, and class name
-//            String longestString = name; // Start with the class name
-//            for (String attribute : attributes) {
-//                if (metrics.stringWidth(attribute) > metrics.stringWidth(longestString)) {
-//                    longestString = attribute;
-//                }
-//            }
-//            for (String method : methods) {
-//                if (metrics.stringWidth(method) > metrics.stringWidth(longestString)) {
-//                    longestString = method;
-//                }
-//            }
-//// Calculate the width based on the longest string
-//            int textWidth2 = metrics.stringWidth(longestString);
-//            boxWidth = Math.max(boxWidth, textWidth2 + padding * 2); // Add padding for margins
-//
-//// Adjust height based on attributes and methods
-//            int attributeSectionHeight = 20 * attributes.size();
-//            int methodSectionHeight = 20 * methods.size();
-//            boxHeight = 50 + attributeSectionHeight + methodSectionHeight + 40;
-//
-//            System.out.println("height: "+ boxHeight+ ", width: "+boxWidth);
-//
-//            setPreferredSize(new Dimension(boxWidth, boxHeight));
-//            revalidate();
-
 // Set up drawing starting coordinates for the box
             x = (int) point.getX();
             y = (int) point.getY();
@@ -614,6 +489,7 @@ public class ClassBox extends UMLComponent {
         if(classType.equals("Interface"))
         {
             setPreferredSize(new Dimension(boxWidth, boxHeight+40));
+
         }
         else {
             // Update preferred size
@@ -636,10 +512,12 @@ public class ClassBox extends UMLComponent {
         return relationships;
     }
 
+    //ClassBox
     public JSONObject toJSON() {
         JSONObject json = new JSONObject();
 
         // Serialize inherited attributes
+        json.put("type", "ClassBox");
         json.put("name", this.name);
         json.put("classType", this.classType);
 
@@ -654,6 +532,16 @@ public class ClassBox extends UMLComponent {
                 .put("x", this.point.x)
                 .put("y", this.point.y));
 
+        Rectangle bounds = this.getBounds(); // Assuming getBounds() is implemented
+        json.put("bounds", new JSONObject()
+                .put("x", bounds.x)
+                .put("y", bounds.y)
+                .put("width", bounds.width)
+                .put("height", bounds.height));
+
+        json.put("location", new JSONObject()
+                .put("x", this.getLocation().x)
+                .put("y", this.getLocation().y));
         // Return the JSON object
         return json;
     }

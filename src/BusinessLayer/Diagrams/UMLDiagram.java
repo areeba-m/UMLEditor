@@ -1,5 +1,6 @@
 package BusinessLayer.Diagrams;
 
+import BusinessLayer.Components.ClassDiagramComponents.ClassDiagramRelationship;
 import BusinessLayer.Components.UMLComponent;
 import ui.PopupMenu;
 import javax.swing.*;
@@ -179,4 +180,6 @@ public abstract class UMLDiagram extends JPanel{
         }
         return null;
     }
+
+    public abstract void addComponents(UMLComponent component);
 }

@@ -27,12 +27,9 @@ import java.util.Map;
 public class ClassDiagram extends UMLDiagram {
 
     public ClassDiagram() {
-
+        super();
         this.components = new ArrayList<>();
         this.name = "";
-        setLayout(null);
-        setPreferredSize(new Dimension(2000,2000));
-        setBackground(Color.PINK);
     }
 
     @Override
@@ -63,6 +60,22 @@ public class ClassDiagram extends UMLDiagram {
         setupComponentForDiagram(component);
         add(component);
         component.setBounds(50, 50, component.getPreferredSize().width, component.getPreferredSize().height);
+        revalidate();
+        repaint();
+    }
+
+    public void addComponents(UMLComponent component) {
+        if(components.contains(component)){
+            System.out.println("COMPONENT EXISTS: called Add component for " + component);
+            return;
+        }
+
+        System.out.println("Add called for component: " + component);
+
+        components.add(component);
+        setupComponentForDiagram(component);
+        add(component);
+        //component.setBounds(50, 50, component.getPreferredSize().width, component.getPreferredSize().height);
         revalidate();
         repaint();
     }
@@ -146,6 +159,11 @@ public class ClassDiagram extends UMLDiagram {
                 ClassBox classBox = (ClassBox) component;
                 // Add the JSON representation of ClassBox to the components array
                 componentsArray.put(classBox.toJSON());
+            }
+            else if (component instanceof ClassDiagramRelationship) {
+                ClassDiagramRelationship relationship = (ClassDiagramRelationship) component;
+                // Add the JSON representation of ClassBox to the components array
+                componentsArray.put(relationship.toJSON());
             }
         }
 // Add the JSON array to the class diagram JSON object
