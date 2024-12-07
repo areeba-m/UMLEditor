@@ -1,43 +1,60 @@
 package BusinessLayer.Components;
 
+import BusinessLayer.Components.ClassDiagramComponents.ClassBox;
 import BusinessLayer.Components.ClassDiagramComponents.ClassDiagramRelationship;
 import BusinessLayer.Components.UseCaseDiagramComponents.UseCaseDiagramRelationship;
+import BusinessLayer.Diagrams.ClassDiagram;
+import BusinessLayer.Diagrams.UMLDiagram;
+import org.json.JSONObject;
 import ui.UMLEditorForm;
-
 import BusinessLayer.Components.ClassDiagramComponents.ClassBox;
-
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.util.ArrayList;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import java.io.Serializable;
+import java.util.List;
 
 import static BusinessLayer.Diagrams.UMLDiagram.components;
-import static BusinessLayer.Diagrams.UMLDiagram.getComponentArr;
 
-
+@JsonIgnoreProperties({
+        "accessibleContext",
+        "graphicsConfiguration",
+        "rootPane",
+        "layeredPane",
+        "contentPane",
+        "transferHandler",
+        "inputMap",
+        "actionMap",
+        "clientProperty",
+        "focusTraversalPolicyProvider",
+        "focusCycleRoot",
+        "UI", // Another internal property that could be ignored
+        "componentOrientation", // Component orientation
+        "focusTraversalPolicy", // Focus policy
+        "focusOwner" // Current focus owner
+})
 public abstract class UMLComponent extends JComponent {
     protected String name;
     protected Point point;
-    protected String classType;// I made this for class diagram
+    protected String classType;//i made this for class diagram
 
     protected Point dragOffset;
     private boolean isSelected = false;
-
     protected boolean isGridPanel = false;
     protected boolean isDropped = false;
-
+    @JsonIgnore
     protected static JTextArea textArea;
 
     public UMLComponent() {
 
         textArea = UMLEditorForm.getTextArea();
-
         // Add mouse listeners for drag functionality
         addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
-
                 dragOffset = e.getPoint();
 
                 for (UMLComponent component :components) {
@@ -58,10 +75,8 @@ public abstract class UMLComponent extends JComponent {
                 }
 
             }
-
             @Override
             public void mouseReleased(MouseEvent e){
-
                 boolean clickedOnComponent = false;
                 // Check if the click is on any component
                 for (UMLComponent component : components) {
@@ -88,7 +103,7 @@ public abstract class UMLComponent extends JComponent {
             @Override
             public void mouseDragged(MouseEvent e) {
 
-                if(UMLComponent.this instanceof  UseCaseDiagramRelationship ||
+                if(UMLComponent.this instanceof UseCaseDiagramRelationship ||
                         UMLComponent.this instanceof ClassDiagramRelationship){
                     return;
                 }
@@ -103,7 +118,6 @@ public abstract class UMLComponent extends JComponent {
                     getParent().revalidate();
                     getParent().repaint();
                 }
-
             }
         });
     }
@@ -114,7 +128,7 @@ public abstract class UMLComponent extends JComponent {
     }
     public void SetTextArea(String text)
     {
-        textArea.setText(text);
+        this.textArea.setText(text);
     }
     public String getType()
     {
@@ -155,6 +169,10 @@ public abstract class UMLComponent extends JComponent {
         repaint();
     }
 
+    public void setTextArea(JTextArea txtArea)
+    {
+        this.textArea = txtArea;
+    }
     public void setIsGridPanel(boolean flag)
     {
         this.isGridPanel = flag;
@@ -164,10 +182,6 @@ public abstract class UMLComponent extends JComponent {
     {
         return isGridPanel;
     }
-
-    public abstract void updateFromTextArea();
-
-    public abstract void draw(Graphics g);
 
     @Override
     public String getName() {
@@ -179,6 +193,12 @@ public abstract class UMLComponent extends JComponent {
         this.name = name;
         repaint();
     }
+    public abstract void updateFromTextArea();
+
+    public abstract void draw(Graphics g);
+    public abstract void setMethods(List<Object> methods);
+
+    public abstract void setAttributes(List<Object> attributes);
 
     public Point getPoint() {
         return point;
@@ -187,5 +207,19 @@ public abstract class UMLComponent extends JComponent {
     public void setPoint(Point point) {
         this.point = point;
     }
+    public void setHeight(int height) {
+    }
 
+    public void setWidth(int width) {
+
+    }
+
+    public void addAttribute(String[] att) {
+    }
+
+    public void addMethods(String[] meth) {
+
+    }
+
+    public abstract JSONObject toJSON();
 }

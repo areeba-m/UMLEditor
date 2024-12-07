@@ -11,9 +11,4 @@ import java.io.IOException;
 
 public class ClassComponent{
 
-    public ClassComponent(){
-
-
-    }
-
 }

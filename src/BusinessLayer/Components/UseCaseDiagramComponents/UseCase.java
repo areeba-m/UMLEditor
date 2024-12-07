@@ -1,11 +1,30 @@
 package BusinessLayer.Components.UseCaseDiagramComponents;
 
 import BusinessLayer.Components.UMLComponent;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import org.json.JSONObject;
 
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
-
+import java.util.List;
+@JsonIgnoreProperties({
+        "accessibleContext",
+        "graphicsConfiguration",
+        "rootPane",
+        "layeredPane",
+        "contentPane",
+        "transferHandler",
+        "inputMap",
+        "actionMap",
+        "clientProperty",
+        "focusTraversalPolicyProvider",
+        "focusCycleRoot",
+        "UI", // Another internal property that could be ignored
+        "componentOrientation", // Component orientation
+        "focusTraversalPolicy", // Focus policy
+        "focusOwner" // Current focus owner
+})
 public class UseCase extends UMLComponent {
     private ArrayList<Actor> actors = new ArrayList<>();
 
@@ -89,6 +108,33 @@ public class UseCase extends UMLComponent {
     @Override
     public void draw(Graphics g) {
 
+    }
+
+    @Override
+    public void setMethods(List<Object> methods) {
+
+    }
+
+    @Override
+    public void setAttributes(List<Object> attributes) {
+
+    }
+
+    @Override
+    public JSONObject toJSON() {
+        JSONObject json = new JSONObject();
+
+        // Serialize inherited attributes
+        json.put("type", "UseCase");
+        json.put("name", this.name);
+        Rectangle bounds = this.getBounds(); // Assuming getBounds() is implemented
+        json.put("bounds", new JSONObject()
+                .put("x", bounds.x)
+                .put("y", bounds.y)
+                .put("width", bounds.width)
+                .put("height", bounds.height));
+
+        return json;
     }
 
     public void addActor(Actor actor) {

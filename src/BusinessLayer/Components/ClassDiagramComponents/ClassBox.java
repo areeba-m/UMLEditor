@@ -1,26 +1,45 @@
 package BusinessLayer.Components.ClassDiagramComponents;
 
 import BusinessLayer.Components.UMLComponent;
-import BusinessLayer.Components.UseCaseDiagramComponents.UseCase;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import org.json.JSONObject;
 import ui.UMLEditorForm;
 
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
+import java.util.Collection;
 
+@JsonIgnoreProperties({
+        "accessibleContext",
+        "graphicsConfiguration",
+        "rootPane",
+        "layeredPane",
+        "contentPane",
+        "transferHandler",
+        "inputMap",
+        "actionMap",
+        "clientProperty",
+        "focusTraversalPolicyProvider",
+        "focusCycleRoot",
+        "UI", // Another internal property that could be ignored
+        "componentOrientation", // Component orientation
+        "focusTraversalPolicy", // Focus policy
+        "focusOwner" // Current focus owner
+})
 public class ClassBox extends UMLComponent {
     ArrayList<String> attributes;
     ArrayList<String> methods;
     ArrayList<ClassDiagramRelationship> relationships;
-
     int height;
     int width;
     //String classType; shifted to UMLComponent
 
-    public ClassBox() {
-        //setPreferredSize(new Dimension(200, 200));
+    public ClassBox()
+    {
+        //setPreferredSize(new Dimension(200,200));
 
-        this.point = new Point(0, 0);
+        this.point = new Point(0,0);
         this.name = "";
         this.classType = "";
         this.attributes = new ArrayList<>();
@@ -34,45 +53,45 @@ public class ClassBox extends UMLComponent {
         this.isDropped = false;
         setSelected(false);//component is not selected initially
         textArea = UMLEditorForm.getTextArea();
-
     }
 
     @Override
     public void updateFromTextArea() {
-        //String[] sections = textArea.getText().split("\n----------------------------------------\n");
-        String[] sections = textArea.getText().split("\n--\n");
+        String[] sections = textArea.getText().split("\n----------------------------------------\n");
 
+        // Clear existing attributes and methods
+        attributes.clear();
+        methods.clear();
+
+        // Ensure the class name is always set (if available)
+        if (sections.length > 0 && !sections[0].isBlank()) {
+            setName(sections[0].trim());
+        }
+
+        // Handle attributes section, if present
         String[] attributes = new String[0];
+        if (sections.length > 1 && !sections[1].isBlank()) {
+            attributes = sections[1].split("\n");
+        }
+        addAttribute(attributes);
 
+        // Handle methods section, if present
         String[] methods = new String[0];
-        for(int i = 0; i < sections.length; i++)
-        {
-            if(i == 0)
-            {
-                setName(sections[0]);
-            }
-            else if(i == 1)
-            {
-                attributes  = sections[1].split("\n");
-            }
-            else if(i == 2)
-            {
-                methods = sections[2].split("\n");
-            }
+        if (sections.length > 2 && !sections[2].isBlank()) {
+            methods = sections[2].split("\n");
         }
-        if(this.classType.equalsIgnoreCase("interface")){
-            addMethods(attributes);
-        } else {
-            addAttribute(attributes);
-            addMethods(methods);
-        }
+        addMethods(methods);
+
+        // Repaint to reflect changes
         repaint();
     }
 
     public boolean checkAttributePresence(String value)
     {
-        for (String attribute : attributes) {
-            if (attribute.equals(value)) {
+        for(int i = 0; i < attributes.size();i++)
+        {
+            if(attributes.get(i).equals(value))
+            {
                 return true;
             }
         }
@@ -80,72 +99,120 @@ public class ClassBox extends UMLComponent {
     }
     public boolean checkMethodsPresence(String value)
     {
-        for (String method : methods) {
-            if (method.equals(value)) {
+        for(int i = 0; i < methods.size();i++)
+        {
+            if(methods.get(i).equals(value))
+            {
                 return true;
             }
         }
         return false;
     }
 
+    public void addMethods(String[] list)
+    {
+        for(int i = 0; i < list.length; i++)
+        {
+            if(!checkMethodsPresence(list[i])) {
+                methods.add(list[i]);
+            }
+        }
+        updatePreferredSize();
+        // Update bounds to avoid rendering issues
+        setBounds(getX(), getY(), getPreferredSize().width, getPreferredSize().height);
+        //point.setLocation(getX(), getY());
+        System.out.println("Height: "+height+", width: "+width);
+//        revalidate();
+//        repaint();
+    }
+
      public void addAttribute(String[] list)
      {
-         for (String s : list) {
-             if (!checkAttributePresence(s)) {
-                 attributes.add(s);
+         for(int i = 0; i < list.length; i++)
+         {
+             if(!checkAttributePresence(list[i])) {
+                 attributes.add(list[i]);
              }
          }
          updatePreferredSize();
          // Update bounds to avoid rendering issues
          setBounds(getX(), getY(), getPreferredSize().width, getPreferredSize().height);
-         //System.out.println("Height: "+height+", width: "+width);
-         //revalidate();
-         //repaint();
+         //point.setLocation(getX(), getY());
+         System.out.println("Height: "+height+", width: "+width);
+//         revalidate();
+//         repaint();
      }
-     public void addMethods(String[] list)
-     {
-         for (String s : list) {
-             if (!checkMethodsPresence(s)) {
-                 methods.add(s);
-             }
-         }
-         updatePreferredSize();
-         // Update bounds to avoid rendering issues
-         setBounds(getX(), getY(), getPreferredSize().width, getPreferredSize().height);
-         //System.out.println("Height: " + height + ", width: " + width);
-        // revalidate();
-        // repaint();
+    public void setAttributes(ArrayList<String> attributesList) {
+        if (attributesList != null) {
+            this.attributes.clear();
+            this.attributes.addAll((Collection<? extends String>) attributesList);
+        }
+    }
+    public void setPoint(Point point) {
+        if(point == null) {
+            this.point = new Point(point);
+        }
+    }
+
+    public void setHeight(int height) {
+        this.height = height;
+    }
+
+    public void setWidth(int width) {
+        this.width = width;
+
+    }
+    // Setter for methods
+    public void setMethods(ArrayList<String> methodsList) {
+        if (methodsList != null) {
+            this.methods.clear();
+            this.methods.addAll((Collection<? extends String>) methodsList);
+        }
     }
 
     public void handleClassBoxMousePressed(MouseEvent e)
     {
-        String text = name.concat("\n--\n");
-        for(String attribute:attributes){
-            text = text.concat(attribute + "\n");
+        //setSelected(true);
+        String text = name;
+        text += "\n";
+        //starting attributes
+        for(int i = 0; i < 40; i++)
+        {
+            text += "-";
         }
-        text = text.concat("--\n");
-        for(String method:methods){
-            text = text.concat(method + "\n");
+        text += "\n";
+        if(attributes.size() <= 0) {
+            text += "\n";
         }
-        System.out.println("Text: " + text);
+        for(int i = 0; i < attributes.size(); i++)
+        {
+            text += attributes.get(i);
+            text += "\n";
+        }
+        //starting methods
+        for(int i = 0; i < 40; i++)
+        {
+            text += "-";
+        }
+        text += "\n";
+        for(int i = 0; i < methods.size(); i++)
+        {
+            text += methods.get(i);
+            text += "\n";
+        }
         textArea.removeAll();
         textArea.setText(text);
 
-        // Update bounds to avoid rendering issues
-        setBounds(getX(), getY(), getPreferredSize().width, getPreferredSize().height);
-
-        // Repaint parent to clear artifacts
-        getParent().repaint();
+            // Update bounds to avoid rendering issues
+            setBounds(getX(), getY(), getPreferredSize().width, getPreferredSize().height);
+            // Repaint parent to clear artifacts
+            getParent().repaint();
     }
     public void handleClassBoxMouseReleased(MouseEvent e)
     {
-        // setSelected(false);
-        // textArea.setText("Add Diagram Notes.");
     }
     public void handleClassBoxMouseDragged(MouseEvent e)
     {
-        // this.point = e.getPoint();
-        // updatePreferredSize();
         if (point != null) {
             Point currentLocation = getLocation();
             int deltaX = e.getX() - point.x;
@@ -153,10 +220,8 @@ public class ClassBox extends UMLComponent {
 
             // Update location
             setLocation(currentLocation.x + deltaX, currentLocation.y + deltaY);
-
             // Update bounds to avoid rendering issues
             setBounds(getX(), getY(), getPreferredSize().width, getPreferredSize().height);
-
             // Repaint parent to clear artifacts
             getParent().repaint();
         }
@@ -166,6 +231,40 @@ public class ClassBox extends UMLComponent {
 
     }
     @Override
+    public void setMethods(java.util.List<Object> methods) {
+        if (methods != null) {
+            this.methods.clear();
+            // Convert Object list to String list and add to methods
+            for (Object method : methods) {
+                if (method instanceof String) {
+                    this.methods.add((String) method);  // Add the method if it's a string
+                }
+            }
+        }
+    }
+    @Override
+    public void setAttributes(java.util.List<Object> attributes) {
+        if (attributes != null) {
+            this.attributes.clear();
+            // Convert Object list to String list and add to attributes
+            for (Object attribute : attributes) {
+                if (attribute instanceof String) {
+                    this.attributes.add((String) attribute);  // Add the attribute if it's a string
+                }
+            }
+        }
+    }
+
+    public ArrayList<String> getAttributes()
+    {
+        return attributes;
+    }
+    public ArrayList<String> getMethods()
+    {
+        return methods;
+    }
+
+    @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
         Graphics2D g2d = (Graphics2D) g;
@@ -173,14 +272,17 @@ public class ClassBox extends UMLComponent {
         // Set the rendering hints for better text and graphics quality
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
+        System.out.println(point.getLocation());
         // Define padding and box dimensions
-        int x,y, boxHeight, boxWidth;
+        int x = (int)point.getX();
+        int y = (int)point.getY();
 
         if (classType.equals("Interface")) {
             int padding = 10; // Padding for text inside the box
-            boxHeight = height + 40; // Initial box height
-            boxWidth = width; // Minimum box width
+            int boxHeight = height + 40; // Initial box height
+            int boxWidth = width; // Minimum box width
 
+            // Get FontMetrics for measuring string widths
             FontMetrics metrics = g2d.getFontMetrics(g2d.getFont());
 
             //System.out.println("height: "+ boxHeight+ ", width: "+boxWidth);
@@ -232,15 +334,16 @@ public class ClassBox extends UMLComponent {
                 methodY += 20;
             }
         }
-
         else if (classType.equals("Abstract"))
         {
             int padding = 10; // Padding for text inside the box
-            boxHeight = height + 10; // Initial box height
-            boxWidth = width; // Minimum box width
+            int boxHeight = height + 10; // Initial box height
+            int boxWidth = width; // Minimum box width
 
+            // Get FontMetrics for measuring string widths
             FontMetrics metrics = g2d.getFontMetrics(g2d.getFont());
-            //System.out.println("height: "+ boxHeight+ ", width: "+boxWidth);
+
+           // System.out.println("height: "+ boxHeight+ ", width: "+boxWidth);
 
             // Set up drawing starting coordinates for the box
             x = (int) point.getX();
@@ -254,6 +357,7 @@ public class ClassBox extends UMLComponent {
             g2d.setFont(new Font("Segoe UI Emoji", Font.ITALIC, 14));
 
             // Get font metrics for centering the class name
+            //FontMetrics metrics = g2d.getFontMetrics(g2d.getFont());
             String classHeader = name;
             int textWidth = metrics.stringWidth(classHeader);
             int textHeight = metrics.getHeight();
@@ -293,18 +397,20 @@ public class ClassBox extends UMLComponent {
         else
         {
             int padding = 10; // Padding for text inside the box
-            boxHeight = height + 10; // Initial box height
-            boxWidth = width; // Minimum box width
+            int boxHeight = height + 10; // Initial box height
+            int boxWidth = width; // Minimum box width
 
             // Get FontMetrics for measuring string widths
             FontMetrics metrics = g2d.getFontMetrics(g2d.getFont());
-
+            // Set up drawing starting coordinates for the box
             x = (int) point.getX();
             y = (int) point.getY();
 
             // Draw the class box
             g2d.drawRect(x, y, boxWidth, boxHeight);
 
+            // Get font metrics for centering the class name
+            //FontMetrics metrics = g2d.getFontMetrics(g2d.getFont());
             String classHeader = name;
             int textWidth = metrics.stringWidth(classHeader);
             int textHeight = metrics.getHeight();
@@ -336,11 +442,8 @@ public class ClassBox extends UMLComponent {
             for (String method : methods) {
                 g2d.drawString(method, x + padding, methodY);
                 methodY += 20;
-
             }
-
         }
-
         if (isSelected()) {
             // Save the original stroke
             Stroke originalStroke = g2d.getStroke();
@@ -357,7 +460,6 @@ public class ClassBox extends UMLComponent {
             g2d.setStroke(originalStroke);
         }
     }
-
     public void updatePreferredSize() {
         FontMetrics metrics = getFontMetrics(getFont());
         int maxTextWidth = metrics.stringWidth(name); // Start with class name width
@@ -379,6 +481,7 @@ public class ClassBox extends UMLComponent {
         if(classType.equals("Interface"))
         {
             setPreferredSize(new Dimension(boxWidth, boxHeight+40));
+
         }
         else {
             // Update preferred size
@@ -387,24 +490,8 @@ public class ClassBox extends UMLComponent {
         revalidate(); // Notify the layout manager to adjust
         repaint();    // Request a repaint for the updated size
     }
-
     public void addRelationship(ClassDiagramRelationship relationship) {
         if (!relationships.contains(relationship)) {
-            // if relationship is inheritance & current class is a child,
-            // check for abstract methods & update my method list
-
-            //if(relationship.getFrom().equals(this)){
-                // get parent's
-            //}
-
-
-
-
-
-
-
-
-
             relationships.add(relationship);
         }
     }
@@ -417,225 +504,40 @@ public class ClassBox extends UMLComponent {
         return relationships;
     }
 
-    public ArrayList<String> getAttributes() {
-        return attributes;
+    //ClassBox
+    public JSONObject toJSON() {
+        JSONObject json = new JSONObject();
+
+        // Serialize inherited attributes
+        json.put("type", "ClassBox");
+        json.put("name", this.name);
+        json.put("classType", this.classType);
+
+        // Serialize the specific attributes of ClassBox
+        json.put("attributes", this.attributes);
+        json.put("methods", this.methods);
+        json.put("height", this.height);
+        json.put("width", this.width);
+
+        // Serialize the point (location)
+        json.put("point", new JSONObject()
+                .put("x", this.point.x)
+                .put("y", this.point.y));
+
+        Rectangle bounds = this.getBounds(); // Assuming getBounds() is implemented
+        json.put("bounds", new JSONObject()
+                .put("x", bounds.x)
+                .put("y", bounds.y)
+                .put("width", bounds.width)
+                .put("height", bounds.height));
+
+        json.put("location", new JSONObject()
+                .put("x", this.getLocation().x)
+                .put("y", this.getLocation().y));
+        // Return the JSON object
+        return json;
     }
 
-    public ArrayList<String> getMethods() {
-        return methods;
-    }
-
-    @Override
-    public int getHeight() {
-        return height;
-    }
-
-    @Override
-    public int getWidth() {
-        return width;
-    }
 }
-/*
-public class ClassBox extends UMLComponent {
-    ArrayList<String> attributes;
-    ArrayList<String> methods;
-    int height;
-    int width;
-
-    public ClassBox() {
-        this.point = new Point(0, 0);
-        this.name = "";
-        this.classType = "";
-        this.attributes = new ArrayList<>();
-        this.methods = new ArrayList<>();
-
-        this.height = 60;
-        this.width = 100;
-
-        this.isGridPanel = false;
-        this.isDropped = false;
-        setSelected(false); // Component is not selected initially
-        textArea = UMLEditorForm.getTextArea();
-
-        // Ensure the component has an opaque background
-        setOpaque(true);
-        setBackground(Color.WHITE);
-    }
-
-    @Override
-    public void updateFromTextArea() {
-        String[] sections = textArea.getText().split("\n--\n");
-
-        String[] attributes = new String[0];
-        String[] methods = new String[0];
-
-        for (int i = 0; i < sections.length; i++) {
-            if (i == 0) {
-                setName(sections[0]);
-            } else if (i == 1) {
-                attributes = sections[1].split("\n");
-            } else if (i == 2) {
-                methods = sections[2].split("\n");
-            }
-        }
-
-        addAttribute(attributes);
-        addMethods(methods);
-        updateBounds();
-        repaint();
-    }
-
-    private void updateBounds() {
-        // Update the bounds of the ClassBox based on its calculated preferred size
-        updatePreferredSize();
-        setBounds(getX(), getY(), getPreferredSize().width, getPreferredSize().height);
-        getParent().repaint(); // Ensure the parent container updates
-    }
-
-    public void addAttribute(String[] list) {
-        for (String s : list) {
-            if (!checkAttributePresence(s)) {
-                attributes.add(s);
-            }
-        }
-        updateBounds();
-    }
-
-    public void addMethods(String[] list) {
-        for (String s : list) {
-            if (!checkMethodsPresence(s)) {
-                methods.add(s);
-            }
-        }
-        updateBounds();
-    }
-
-    private boolean checkAttributePresence(String value) {
-        for (String attribute : attributes) {
-            if (attribute.equals(value)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private boolean checkMethodsPresence(String value) {
-        for (String method : methods) {
-            if (method.equals(value)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    @Override
-    protected void paintComponent(Graphics g) {
-        super.paintComponent(g);
-        Graphics2D g2d = (Graphics2D) g;
-
-        // Set anti-aliasing for better visuals
-        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-
-        // Ensure white opaque background
-        g2d.setColor(getBackground());
-        g2d.fillRect(0, 0, getWidth(), getHeight());
-
-        // Define padding and box dimensions
-        int padding = 10;
-        int yOffset = padding;
-
-        // Draw the class name or interface/abstract type
-        g2d.setColor(Color.BLACK);
-        g2d.setFont(new Font("Segoe UI", Font.BOLD, 14));
-        FontMetrics metrics = g2d.getFontMetrics();
-
-        String headerText = classType.equals("Interface") ? "<<Interface>> " + name
-                : classType.equals("Abstract") ? name + " (Abstract)"
-                : name;
-        int textWidth = metrics.stringWidth(headerText);
-
-        g2d.drawString(headerText, (getWidth() - textWidth) / 2, yOffset + metrics.getAscent());
-        yOffset += metrics.getHeight() + padding;
-
-        // Draw a divider line
-        g2d.drawLine(padding, yOffset, getWidth() - padding, yOffset);
-        yOffset += padding;
-
-        // Draw attributes
-        for (String attribute : attributes) {
-            g2d.drawString(attribute, padding, yOffset + metrics.getAscent());
-            yOffset += metrics.getHeight();
-        }
-
-        // Draw a divider line for methods
-        g2d.drawLine(padding, yOffset, getWidth() - padding, yOffset);
-        yOffset += padding;
-
-        // Draw methods
-        for (String method : methods) {
-            g2d.drawString(method, padding, yOffset + metrics.getAscent());
-            yOffset += metrics.getHeight();
-        }
-
-        // If selected, draw a dashed border
-        if (isSelected()) {
-            g2d.setColor(Color.BLUE);
-            Stroke originalStroke = g2d.getStroke();
-            float[] dashPattern = {5, 5};
-            g2d.setStroke(new BasicStroke(1.5f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 10, dashPattern, 0));
-            g2d.drawRect(0, 0, getWidth() - 1, getHeight() - 1);
-            g2d.setStroke(originalStroke);
-        }
-    }
-
-    @Override
-    public void draw(Graphics g) {
-        // Drawing logic for the UML diagram (if necessary)
-    }
-
-    public void handleClassBoxMousePressed(MouseEvent e) {
-        // Update bounds on mouse press (to ensure resizing works properly)
-        updateBounds();
-    }
-
-    public void handleClassBoxMouseDragged(MouseEvent e) {
-        // Allow dragging while updating bounds and parent repaint
-        if (point != null) {
-            Point currentLocation = getLocation();
-            int deltaX = e.getX() - point.x;
-            int deltaY = e.getY() - point.y;
-
-            setLocation(currentLocation.x + deltaX, currentLocation.y + deltaY);
-            updateBounds();
-        }
-    }
 
 
-    public void updatePreferredSize() {
-        FontMetrics metrics = getFontMetrics(getFont());
-        int maxTextWidth = metrics.stringWidth(name); // Start with class name width
-
-        // Find the longest attribute or method string
-        for (String attribute : attributes) {
-            maxTextWidth = Math.max(maxTextWidth, metrics.stringWidth(attribute));
-        }
-        for (String method : methods) {
-            maxTextWidth = Math.max(maxTextWidth, metrics.stringWidth(method));
-        }
-
-        // Add padding to the width
-        int boxWidth = maxTextWidth + 20; // Include horizontal padding
-        int boxHeight = 40 + (20 * attributes.size()) + (20 * methods.size());
-
-        // Account for additional space if Interface or Abstract
-        if (classType.equals("Interface")) {
-            boxHeight += 20;
-        }
-
-        this.width = boxWidth;
-        this.height = boxHeight;
-
-        setPreferredSize(new Dimension(boxWidth, boxHeight));
-        revalidate();
-    }
-}*/

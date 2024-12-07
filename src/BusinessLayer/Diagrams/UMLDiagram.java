@@ -1,17 +1,18 @@
 package BusinessLayer.Diagrams;
 
+import BusinessLayer.Components.ClassDiagramComponents.ClassDiagramRelationship;
 import BusinessLayer.Components.UMLComponent;
 import ui.PopupMenu;
-
 import javax.swing.*;
 import java.awt.*;
-import java.util.ArrayList;
 import java.awt.dnd.DropTargetListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-
+import java.util.ArrayList;
 import static ui.UMLEditorForm.isConnectMode;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+@JsonIgnoreProperties({"accessibleContext", "graphicsConfiguration", "rootPane", "layeredPane", "contentPane", "transferHandler", "inputMap", "actionMap", "clientProperty", "focusTraversalPolicyProvider", "focusCycleRoot"}) // Ignore JPanel's internal properties
 public abstract class UMLDiagram extends JPanel{
     String name;
 
@@ -19,7 +20,14 @@ public abstract class UMLDiagram extends JPanel{
     private UMLComponent selectedComponent2 = null;
     private PopupMenu popupMenu;
 
-   public static ArrayList<UMLComponent> components;
+    public static ArrayList<UMLComponent> components;
+
+    protected UMLComponent selectedComponent; // Track the currently selected component
+    protected Point offset; // Offset between the mouse and the top-left corner of the component
+
+    public abstract void addComponent(UMLComponent component);
+    public abstract void removeComponent(UMLComponent component);
+    public abstract void renderComponents(Graphics g);//draws all components on the canvas
 
     public UMLDiagram(){
         setLayout(null);
@@ -27,11 +35,11 @@ public abstract class UMLDiagram extends JPanel{
 
         popupMenu = new PopupMenu(this);
     }
-
-    public abstract void addComponent(UMLComponent component);
-    public abstract void removeComponent(UMLComponent component);
-    public abstract void renderComponents(Graphics g);//draws all components on the canvas
-
+    public static ArrayList<UMLComponent> getComponentList()
+    {
+        return components;
+    }
+    public abstract ArrayList<UMLComponent> getListOfComponents();
     public void setupComponentForDiagram(UMLComponent component) {
         component.addMouseMotionListener(new MouseAdapter() {
             Point prevPoint;
@@ -43,6 +51,7 @@ public abstract class UMLDiagram extends JPanel{
                     return;
                 }
                 popupMenu.setVisible(false);
+                System.out.print("Mouse pressed in UML Diagram:" + prevPoint);
             }
 
             @Override
@@ -61,8 +70,8 @@ public abstract class UMLDiagram extends JPanel{
             @Override
             public void mouseReleased(MouseEvent e) {
                 component.getParent().repaint();
+                //System.out.println(component.getParent());
             }
-
             @Override
             public void mousePressed(MouseEvent e) {
 
@@ -81,24 +90,32 @@ public abstract class UMLDiagram extends JPanel{
                 if(isConnectMode)
                     handleComponentClick(component);
             }
-
         });
-
     }
 
     public UMLComponent getComponentAt(int i)
     {
         return components.get(i);
     }
-    public int getComponentsCount()
-    {
-        return components.size();
+    public void saveToFile(String fileName) {
     }
 
-    public static ArrayList<UMLComponent> getComponentArr() {
-        return components;
+    public void setComponents(ArrayList<UMLComponent> componentList) {
+        if (components != null) {
+            this.components = new ArrayList<>(componentList);  // Copy the input list to the internal list
+            revalidate();  // Revalidate the layout
+            repaint();     // Repaint the diagram after updating the components
+            System.out.println("Components have been set successfully.");
+        } else {
+            System.out.println("Error: Provided list of components is null.");
+        }
     }
 
+    public UMLDiagram loadFromFile(String fileName) {
+        return null;
+    }
+
+    public abstract int getComponentsCount();
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
@@ -164,5 +181,5 @@ public abstract class UMLDiagram extends JPanel{
         return null;
     }
 
-
+    public abstract void addComponents(UMLComponent component);
 }
