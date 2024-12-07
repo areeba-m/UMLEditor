@@ -186,11 +186,13 @@ public class UMLEditorForm extends JFrame {
                                         {
                                             from = (ClassBox) ((ClassDiagramRelationship) component).getFrom();
                                             from.setBounds(((ClassDiagramRelationship) component).getFrom().getBounds());
+                                           // from.updatePreferredSize();
                                         }
                                         if(workingDiagram.getComponentAt(i).getName().equals(((ClassDiagramRelationship) component).getTo().getName()))
                                         {
                                             to = (ClassBox) ((ClassDiagramRelationship) component).getTo();
                                             to.setBounds(((ClassDiagramRelationship) component).getTo().getBounds());
+                                           // to.updatePreferredSize();
                                         }
                                     }
 //                                    ClassBox from = (ClassBox)(((ClassDiagramRelationship) component).getFrom());
