@@ -132,7 +132,7 @@ public class UseCaseDiagram extends UMLDiagram {
         useCaseDiagramJson.put("name", this.getName());
         //creating json array to put multiple components in the components node
         JSONArray componentsArray = new JSONArray();
-// Iterate through the list of UML components
+        // Iterate through the list of UML components
         for (UMLComponent component : getComponentList()) {
             if (component instanceof Actor) {
                 Actor actor = (Actor) component;
@@ -150,7 +150,7 @@ public class UseCaseDiagram extends UMLDiagram {
                 componentsArray.put(relationship.toJSON());
             }
         }
-// Add the JSON array to the class diagram JSON object
+        // Add the JSON array to the class diagram JSON object
         useCaseDiagramJson.put("components", componentsArray);
 
         return useCaseDiagramJson;
@@ -184,7 +184,7 @@ public class UseCaseDiagram extends UMLDiagram {
         ObjectMapper objectMapper = new ObjectMapper();
         // Register the custom deserializer for ClassDiagram
         SimpleModule module = new SimpleModule();
-        module.addDeserializer(UseCaseDiagram.class, new UseCaseDiagramDeserializer());
+        //module.addDeserializer(UseCaseDiagram.class, new UseCaseDiagramDeserializer());
         objectMapper.registerModule(module);
 
         try {

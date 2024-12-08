@@ -504,7 +504,7 @@ public class ClassBox extends UMLComponent {
         return relationships;
     }
 
-    //ClassBox
+    @Override
     public JSONObject toJSON() {
         JSONObject json = new JSONObject();
 
