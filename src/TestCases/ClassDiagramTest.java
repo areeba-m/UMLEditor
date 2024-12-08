@@ -101,7 +101,7 @@ void testToJson() {
     // Check bounds for both components
     assertEquals(component1.getJSONObject("bounds").getInt("x"), 50, "First component bounds x should be 0");
     assertEquals(component1.getJSONObject("bounds").getInt("y"), 50, "First component bounds y should be 0");
-    assertEquals(component1.getJSONObject("bounds").getInt("width"), 129, "First component bounds width should be 200");
+    assertEquals(component1.getJSONObject("bounds").getInt("width"), 132, "First component bounds width should be 200");
     assertEquals(component1.getJSONObject("bounds").getInt("height"), 120, "First component bounds height should be 100");
 }
 

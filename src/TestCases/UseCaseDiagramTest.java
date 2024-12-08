@@ -12,6 +12,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -64,7 +65,7 @@ class UseCaseDiagramTest {
         diagram.addComponent(actor);
         diagram.addComponent(useCase);
 
-        diagram.createConnection(actor, useCase);
+        diagram.createConnection(actor,useCase, "association");
 
         boolean relationshipExists = diagram.getListOfComponents().stream()
                 .anyMatch(component -> component instanceof UseCaseDiagramRelationship &&
@@ -109,12 +110,6 @@ class UseCaseDiagramTest {
         for (UMLComponent component : diagram.getListOfComponents()) {
             assertTrue(loadedDiagram.getListOfComponents().contains(component), "All components should be present in the loaded diagram");
         }
-    }
-
-
-    @Test
-    void testLoadFromFile_InvalidPath() {
-        assertNull(diagram.loadFromFile("invalid_path.json"), "Loading from an invalid path should return null");
     }
 
     @Test

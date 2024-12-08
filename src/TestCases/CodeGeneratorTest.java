@@ -1,9 +1,8 @@
-package Test;
+package TestCases;
 
 import BusinessLayer.Components.ClassDiagramComponents.ClassBox;
 import BusinessLayer.Components.ClassDiagramComponents.ClassDiagramRelationship;
 import Data.CodeGenerator;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;

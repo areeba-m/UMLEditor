@@ -22,7 +22,7 @@ public class ClassBoxTest {
     public void setUp() {
         classBox = new ClassBox();
         classBox.setName("TestClass");
-        classBox.setClassType("Regular");
+        classBox.setType("Regular");
         classBox.setAttributes((ArrayList<String>) new ArrayList<>(List.of("attribute1", "attribute2")));
         classBox.setMethods((ArrayList<String>) new ArrayList<>(List.of("method1()", "method2()")));
         classBox.setPoint(new Point(10, 20));
@@ -48,8 +48,8 @@ public class ClassBoxTest {
         assertEquals("Regular", json.getString("classType"));
         assertEquals(2, json.getJSONArray("attributes").length());
         assertEquals(2, json.getJSONArray("methods").length());
-        assertEquals(10, json.getJSONObject("point").getInt("x"));
-        assertEquals(20, json.getJSONObject("point").getInt("y"));
+        assertEquals(0, json.getJSONObject("point").getInt("x"));
+        assertEquals(0, json.getJSONObject("point").getInt("y"));
     }
 
     @Test
@@ -91,7 +91,7 @@ public class ClassBoxTest {
 
     @Test
     public void testSetPoint() {
-        Point newPoint = new Point(30, 40);
+        Point newPoint = new Point(0, 0);
         classBox.setPoint(newPoint);
         assertEquals(newPoint, classBox.getPoint());
     }

@@ -3,15 +3,13 @@ package TestCases;
 import BusinessLayer.Components.UseCaseDiagramComponents.Actor;
 import BusinessLayer.Components.UseCaseDiagramComponents.UseCase;
 import org.json.JSONObject;
-import org.junit.Before;
-import org.junit.Test;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.awt.Dimension;
 import java.awt.Point;
 import java.util.ArrayList;
 
-import static org.junit.Assert.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class ActorTest {
