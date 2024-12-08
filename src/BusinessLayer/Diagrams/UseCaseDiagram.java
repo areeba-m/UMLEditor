@@ -184,7 +184,7 @@ public class UseCaseDiagram extends UMLDiagram {
         ObjectMapper objectMapper = new ObjectMapper();
         // Register the custom deserializer for ClassDiagram
         SimpleModule module = new SimpleModule();
-        //module.addDeserializer(UseCaseDiagram.class, new UseCaseDiagramDeserializer());
+        module.addDeserializer(UseCaseDiagram.class, new UseCaseDiagramDeserializer());
         objectMapper.registerModule(module);
 
         try {
