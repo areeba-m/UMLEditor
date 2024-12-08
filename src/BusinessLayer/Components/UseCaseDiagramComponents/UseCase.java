@@ -139,4 +139,7 @@ public class UseCase extends UMLComponent {
         }
     }
 
+    public ArrayList<Actor> getActors() {
+        return actors;
+    }
 }

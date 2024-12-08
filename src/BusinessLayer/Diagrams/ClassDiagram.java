@@ -149,6 +149,7 @@ public class ClassDiagram extends UMLDiagram {
         repaint();
         return 0;
     }
+
     public JSONObject toJson() {
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.enable(SerializationFeature.INDENT_OUTPUT); // Pretty print JSON
@@ -157,7 +158,7 @@ public class ClassDiagram extends UMLDiagram {
         classDiagramJson.put("name", this.getName());
         //creating json array to put multiple components in the components node
         JSONArray componentsArray = new JSONArray();
-// Iterate through the list of UML components
+        // Iterate through the list of UML components
         for (UMLComponent component : getComponentList()) {
             if (component instanceof ClassBox) {
                 ClassBox classBox = (ClassBox) component;
@@ -170,7 +171,7 @@ public class ClassDiagram extends UMLDiagram {
                 componentsArray.put(relationship.toJSON());
             }
         }
-// Add the JSON array to the class diagram JSON object
+        // Add the JSON array to the class diagram JSON object
         classDiagramJson.put("components", componentsArray);
 
         return classDiagramJson;

@@ -1,0 +1,25 @@
+{
+  "components" : [ {
+    "methods" : [ ],
+    "name" : "",
+    "width" : 100,
+    "bounds" : {
+      "x" : 50,
+      "width" : 0,
+      "y" : 50,
+      "height" : 0
+    },
+    "attributes" : [ ],
+    "location" : {
+      "x" : 50,
+      "y" : 50
+    },
+    "type" : "ClassBox",
+    "classType" : "",
+    "point" : {
+      "x" : 0,
+      "y" : 0
+    },
+    "height" : 60
+  } ]
+}

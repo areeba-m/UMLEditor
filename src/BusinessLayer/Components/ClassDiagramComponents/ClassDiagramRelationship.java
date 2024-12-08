@@ -32,6 +32,8 @@ public class ClassDiagramRelationship extends UMLComponent{
         this.from = from;
         this.to = to;
         this.name = name;
+        this.point = new Point(0,0);
+        this.endPoint = new Point(0,0);
 
         // Attach listeners to update bounds when 'from' or 'to' move
         if (from != null && to != null) {
@@ -474,4 +476,17 @@ public class ClassDiagramRelationship extends UMLComponent{
         this.to = classBox;
         this.to.setBounds(classBox.getPoint().x, classBox.getPoint().y,classBox.getPreferredSize().width, classBox.getPreferredSize().height);
     }
+    public void setStartMultiplicity(String mul)
+    {
+        this.startMultiplicity = mul;
+    }
+    public void setEndMultiplicity(String mul)
+    {
+        this.endMultiplicity = mul;
+    }
+
+    public String getStartMultiplicity() {
+        return startMultiplicity;
+    }
+
 }
