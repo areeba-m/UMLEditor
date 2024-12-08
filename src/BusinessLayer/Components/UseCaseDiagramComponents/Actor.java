@@ -170,4 +170,8 @@ public class Actor extends UMLComponent {
             useCase.removeActor(this); // Bidirectional relationship
         }
     }
+
+    public ArrayList<UseCase> getUseCases() {
+        return useCases;
+    }
 }

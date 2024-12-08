@@ -480,4 +480,17 @@ private void drawHollowDiamond(Graphics2D g2d, int x, int y) {
         this.to = classBox;
         this.to.setBounds(classBox.getPoint().x, classBox.getPoint().y,classBox.getPreferredSize().width, classBox.getPreferredSize().height);
     }
+    public void setStartMultiplicity(String mul)
+    {
+        this.startMultiplicity = mul;
+    }
+    public void setEndMultiplicity(String mul)
+    {
+        this.endMultiplicity = mul;
+    }
+
+    public String getStartMultiplicity() {
+        return startMultiplicity;
+    }
+
 }
