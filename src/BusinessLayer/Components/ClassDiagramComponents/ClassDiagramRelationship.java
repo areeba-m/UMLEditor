@@ -36,6 +36,8 @@ public class ClassDiagramRelationship extends UMLComponent{
         this.from = from;
         this.to = to;
         this.name = name;
+        this.point = new Point(0,0);
+        this.endPoint = new Point(0,0);
 
         // Attach listeners to update bounds when 'from' or 'to' move
         if (from != null && to != null) {

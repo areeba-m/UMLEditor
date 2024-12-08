@@ -75,7 +75,7 @@ public class UseCaseDiagram extends UMLDiagram {
     }
 
     @Override
-    protected void createConnection(UMLComponent comp1, UMLComponent comp2) {
+    public void createConnection(UMLComponent comp1, UMLComponent comp2) {
 
         JFrame frame = new JFrame("Diagram");
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);

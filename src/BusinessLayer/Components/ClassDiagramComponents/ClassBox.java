@@ -156,6 +156,10 @@ public class ClassBox extends UMLComponent {
         {
             this.point = new Point(point);
         }
+        else
+        {
+            this.point = point;
+        }
     }
 
     public void setHeight(int height) {
@@ -655,5 +659,9 @@ public class ClassBox extends UMLComponent {
                 .put("y", this.getLocation().y));
         // Return the JSON object
         return json;
+    }
+
+    public void setClassType(String regular) {
+        this.classType = regular;
     }
 }

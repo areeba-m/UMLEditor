@@ -170,7 +170,7 @@ public abstract class UMLDiagram extends JPanel{
             selectedComponent2 = null;
         }
     }
-    protected abstract void createConnection(UMLComponent comp1, UMLComponent comp2);
+    public abstract void createConnection(UMLComponent comp1, UMLComponent comp2);
 
     public UMLComponent getSelectedComponent() {
         for (UMLComponent component : components) {
