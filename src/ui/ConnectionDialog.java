@@ -1,6 +1,8 @@
 package ui;
 
+import BusinessLayer.Components.ClassDiagramComponents.ClassDiagramRelationship;
 import BusinessLayer.Components.UMLComponent;
+import BusinessLayer.Components.UseCaseDiagramComponents.UseCaseDiagramRelationship;
 
 import javax.swing.*;
 import javax.swing.border.Border;
@@ -115,9 +117,11 @@ public class ConnectionDialog extends JDialog{
         // Populate the list model and the map
         int counter = 1;
         for (UMLComponent component : components) {
-            String name = (component.getName() != null) ? component.getName() : "Component " + counter++;
-            listModel.addElement(name);
-            nameToComponentMap.put(name, component);
+            if(!(component instanceof ClassDiagramRelationship || component instanceof UseCaseDiagramRelationship)) {
+                String name = (component.getName() != null) ? component.getName() : "Component " + counter++;
+                listModel.addElement(name);
+                nameToComponentMap.put(name, component);
+            }
         }
 
         componentList = new JList<>(listModel);
