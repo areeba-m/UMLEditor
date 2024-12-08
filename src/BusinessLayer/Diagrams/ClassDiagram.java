@@ -47,6 +47,7 @@ public class ClassDiagram extends UMLDiagram {
     public int getComponentsCount() {
         return components.size();
     }
+
     @Override
     public void addComponent(UMLComponent component) {
         if(components.contains(component)){
@@ -75,7 +76,6 @@ public class ClassDiagram extends UMLDiagram {
         components.add(component);
         setupComponentForDiagram(component);
         add(component);
-        //component.setBounds(50, 50, component.getPreferredSize().width, component.getPreferredSize().height);
         revalidate();
         repaint();
     }
@@ -98,6 +98,10 @@ public class ClassDiagram extends UMLDiagram {
                         otherClass.removeRelationship(relationship);
                         components.remove(relationship);
                         remove(relationship);
+                    } else {
+                        // self-association
+                        components.remove(relationship);
+                        remove(relationship);
                     }
                 }
 
@@ -118,32 +122,32 @@ public class ClassDiagram extends UMLDiagram {
 
     }
     @Override
-    protected void createConnection(UMLComponent comp1, UMLComponent comp2) {
+    public int createConnection(UMLComponent comp1, UMLComponent comp2, String type) {
 
-        JFrame frame = new JFrame("Diagram");
-        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        frame.setSize(300, 300);
-        //frame.setVisible(true);
-        frame.setLocationRelativeTo(null);
+        if(comp1 instanceof ClassDiagramRelationship || comp2 instanceof ClassDiagramRelationship){
+            return 4; // 4: invalid component
+        }
 
-        ConnectionDialog dialog = new ConnectionDialog(frame, "Class");
+        if(comp1 == comp2){
+            return 5; // 5: connection between same comps not possible
+        }
 
-        if(dialog.getOptionSelected().equalsIgnoreCase("Association")) {
+        if(type.equalsIgnoreCase("Association")) {
             ClassDiagramRelationship relationship = new ClassDiagramRelationship(comp1, comp2, "Association");
             addComponent(relationship);
-        } else if(dialog.getOptionSelected().equalsIgnoreCase("aggregation")) {
+        } else if(type.equalsIgnoreCase("aggregation")) {
             ClassDiagramRelationship relationship = new ClassDiagramRelationship(comp1, comp2, "aggregation");
             addComponent(relationship);
-        } else if(dialog.getOptionSelected().equalsIgnoreCase("composition")) {
+        } else if(type.equalsIgnoreCase("composition")) {
             ClassDiagramRelationship relationship = new ClassDiagramRelationship(comp1, comp2, "composition");
             addComponent(relationship);
-        } else if(dialog.getOptionSelected().equalsIgnoreCase("inheritance")) {
+        } else if(type.equalsIgnoreCase("inheritance")) {
             ClassDiagramRelationship relationship = new ClassDiagramRelationship(comp1, comp2, "inheritance");
             addComponent(relationship);
         }
-
         revalidate();
         repaint();
+        return 0;
     }
     public JSONObject toJson() {
         ObjectMapper objectMapper = new ObjectMapper();

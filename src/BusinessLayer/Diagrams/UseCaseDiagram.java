@@ -75,28 +75,36 @@ public class UseCaseDiagram extends UMLDiagram {
     }
 
     @Override
-    protected void createConnection(UMLComponent comp1, UMLComponent comp2) {
+    public int createConnection(UMLComponent comp1, UMLComponent comp2, String type) {
 
-        JFrame frame = new JFrame("Diagram");
-        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        frame.setSize(300, 300);
-        frame.setLocationRelativeTo(null);
+        if(comp1 instanceof UseCaseDiagramRelationship || comp2 instanceof UseCaseDiagramRelationship){
+            return 4; // 4: invalid component
+        }
 
-        ConnectionDialog dialog = new ConnectionDialog(frame, "UseCase");
+        if(comp1 == comp2){
+            return 5; // 5: connection between same comps not possible
+        }
 
-        if(dialog.getOptionSelected().equalsIgnoreCase("Association")) {
+        if(type.equalsIgnoreCase("Association")) {
+
+            if(comp1 instanceof UseCase && comp2 instanceof UseCase){
+                return 1; // 1: cant associate 2 use cases
+            }
+
             UseCaseDiagramRelationship relationship = new UseCaseDiagramRelationship(comp1, comp2, "Association");
             addComponent(relationship);
-        } else if(dialog.getOptionSelected().equalsIgnoreCase("Include")) {
+
+        } else if(type.equalsIgnoreCase("Include")) {
             if(comp1 instanceof Actor || comp2 instanceof Actor){
-                //throw exception;
+                return 2; // 2: cant include for actor
             }
 
             UseCaseDiagramRelationship relationship = new UseCaseDiagramRelationship(comp1, comp2, "Include");
             addComponent(relationship);
-        } else if(dialog.getOptionSelected().equalsIgnoreCase("Extend")) {
+
+        } else if(type.equalsIgnoreCase("Extend")) {
             if(comp1 instanceof Actor || comp2 instanceof Actor){
-                //throw exception;
+                return 3; // 3: cant extend for actor
             }
 
             UseCaseDiagramRelationship relationship = new UseCaseDiagramRelationship(comp1, comp2, "Extend");
@@ -105,6 +113,8 @@ public class UseCaseDiagram extends UMLDiagram {
 
         revalidate();
         repaint();
+
+        return 0; // normal
     }
 
     @Override

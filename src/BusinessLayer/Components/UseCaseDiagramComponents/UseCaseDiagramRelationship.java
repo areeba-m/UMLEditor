@@ -70,7 +70,6 @@ public class UseCaseDiagramRelationship extends UMLComponent {
                 }
             });
 
-            // **Force initial bounds calculation**
             updateBounds();
             revalidate();
             repaint(); // Ensure the component is drawn immediately
@@ -307,15 +306,7 @@ public class UseCaseDiagramRelationship extends UMLComponent {
         this.to = to;
         this.to.setBounds(to.getPoint().x, to.getPoint().y, to.getPreferredSize().width, to.getPreferredSize().height);
     }
-//    public void setFrom(UseCase from) {
-//        this.from = from;
-//        this.from.setBounds(from.getPoint().x, from.getPoint().y,from.getPreferredSize().width, from.getPreferredSize().height);
-//    }
-//
-//    public void setTo(UseCase to) {
-//        this.to = to;
-//        this.to.setBounds(to.getPoint().x, to.getPoint().y, to.getPreferredSize().width, to.getPreferredSize().height);
-//    }
+
     public UMLComponent getFrom() {
         return from;
     }

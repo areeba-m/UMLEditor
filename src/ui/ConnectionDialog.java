@@ -1,29 +1,34 @@
 package ui;
 
+import BusinessLayer.Components.UMLComponent;
+
 import javax.swing.*;
 import javax.swing.border.Border;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 
 public class ConnectionDialog extends JDialog{
 
     //JDialog dialog;
-    private String optionSelected="";
+    private JList<String> componentList;
 
-    public ConnectionDialog(JFrame parent, String type) {
-        //dialog = new JDialog(this, "Select Connection Type", true);
+    private Map<String, UMLComponent> nameToComponentMap;
+    private String selectedComponentName;
+
+    String currentComponentName;
+    UMLComponent selectedComponent;
+    ArrayList<UMLComponent> components;
+
+    public ConnectionDialog(JFrame parent, String name, ArrayList<UMLComponent> components) {
         super(parent, "Select Connection Type", true);
 
-        /*dialog.setTitle("Choose Connection Type");
-        dialog.setSize(300, 300);
-        dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-        dialog.setLocationRelativeTo(null);
-        dialog.setResizable(false);
-        dialog.setUndecorated(true); // Remove window frame (borderless)
-        dialog.getRootPane().setWindowDecorationStyle(JRootPane.NONE);*/
-
+        this.components = components;
+        this.currentComponentName = name;
         setTitle("Choose Connection Type");
         setSize(300, 300);
         setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
@@ -32,126 +37,10 @@ public class ConnectionDialog extends JDialog{
         setUndecorated(true); // Remove window frame (borderless)
         getRootPane().setWindowDecorationStyle(JRootPane.NONE);
 
-        if(type.equalsIgnoreCase("UseCase")){
-            createUseCaseDialog();
-        }
-        else if(type.equalsIgnoreCase("Class")){
-            createClassDiagramDialog();
-        }
+        createDialog();
 
         setUIFont(new Font("Segoe UI Emoji", Font.PLAIN, 14));
 
-        /*add(dialog, BorderLayout.CENTER);
-        setVisible(true);
-        setSize(300, 300);
-        setLocationRelativeTo(null);*/
-    }
-    
-    private void createUseCaseDialog() {
-
-        Color customColor = new Color(240, 240, 240);//new Color(105, 198, 194);
-
-        // Create content panel
-        JPanel panel = new JPanel();
-        panel.setBackground(customColor);
-        panel.setLayout(new BorderLayout());
-
-        JPanel topPanel = new JPanel();
-        topPanel.setLayout(new BoxLayout(topPanel, BoxLayout.Y_AXIS));
-
-        topPanel.setBackground(Color.gray);
-
-        JPanel labelPanel = new JPanel();
-        labelPanel.setLayout(new BoxLayout(labelPanel, BoxLayout.X_AXIS));
-        labelPanel.setBackground(Color.gray);
-        JLabel label = new JLabel("Choose a connection type");
-        labelPanel.add(Box.createHorizontalGlue());
-        labelPanel.add(label);
-        labelPanel.add(Box.createHorizontalGlue());
-
-        topPanel.add(Box.createVerticalStrut(20));
-        topPanel.add(labelPanel);
-        topPanel.add(Box.createVerticalStrut(20));
-
-        panel.add(topPanel, BorderLayout.NORTH);
-
-        JPanel radioPanel = new JPanel();
-        radioPanel.setLayout(new BoxLayout(radioPanel, BoxLayout.Y_AXIS));
-        radioPanel.setBackground(customColor);
-
-        // Create radio buttons
-        JRadioButton associationButton = new JRadioButton("Association");
-        JRadioButton includeButton = new JRadioButton("Include");
-        JRadioButton excludeButton = new JRadioButton("Exclude");
-
-        associationButton.setBackground(customColor);
-        includeButton.setBackground(customColor);
-        excludeButton.setBackground(customColor);
-
-        // Group the radio buttons
-        ButtonGroup group = new ButtonGroup();
-        group.add(associationButton);
-        group.add(includeButton);
-        group.add(excludeButton);
-
-        radioPanel.add(Box.createVerticalStrut(20));
-        radioPanel.add(associationButton);
-        radioPanel.add(includeButton);
-        radioPanel.add(excludeButton);
-        radioPanel.add(Box.createVerticalGlue());
-
-        panel.add(radioPanel, BorderLayout.CENTER);
-
-        JPanel buttonPanel = new JPanel();
-        buttonPanel.setLayout(new FlowLayout(FlowLayout.CENTER)); // Center align buttons
-
-        JButton okButton = new JButton("OK");
-        JButton cancelButton = new JButton("Cancel");
-
-        okButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                // Perform action for OK button
-                String selectedOption = getUseCaseSelectedOption(associationButton, includeButton, excludeButton);
-                ConnectionDialog.this.optionSelected = selectedOption;
-                System.out.println("Selected Option: " + selectedOption);
-                dispose(); // Close dialog
-            }
-        });
-
-        cancelButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                dispose(); // Close dialog on Cancel
-            }
-        });
-
-        buttonPanel.add(okButton);
-        buttonPanel.add(cancelButton);
-
-        panel.add(buttonPanel, BorderLayout.SOUTH);
-
-        Border border = BorderFactory.createLineBorder(Color.DARK_GRAY, 2);
-        panel.setBorder(border); // Apply the border to the panel
-
-        /*dialog.*/setContentPane(panel);
-
-        //dialog.setShape(new java.awt.geom.RoundRectangle2D.Double(0, 0, dialog.getWidth(), dialog.getHeight(), 30, 30));
-
-        /*dialog.*/setVisible(true);
-
-    }
-
-    private String getUseCaseSelectedOption(JRadioButton associationButton, JRadioButton includeButton, JRadioButton excludeButton) {
-        if (associationButton.isSelected()) {
-            return "Association";
-        } else if (includeButton.isSelected()) {
-            return "Include";
-        } else if (excludeButton.isSelected()) {
-            return "Exclude";
-        } else {
-            return "No option selected";
-        }
     }
 
     public static void setUIFont(Font font) {
@@ -165,8 +54,7 @@ public class ConnectionDialog extends JDialog{
         }
     }
 
-    private void createClassDiagramDialog() {
-
+    public void createDialog(){
         Color customColor = new Color(240, 240, 240);//new Color(105, 198, 194);
 
         // Create content panel
@@ -182,7 +70,7 @@ public class ConnectionDialog extends JDialog{
         JPanel labelPanel = new JPanel();
         labelPanel.setLayout(new BoxLayout(labelPanel, BoxLayout.X_AXIS));
         labelPanel.setBackground(Color.gray);
-        JLabel label = new JLabel("Choose a connection type");
+        JLabel label = new JLabel("Choose a component");
         labelPanel.add(Box.createHorizontalGlue());
         labelPanel.add(label);
         labelPanel.add(Box.createHorizontalGlue());
@@ -193,36 +81,51 @@ public class ConnectionDialog extends JDialog{
 
         panel.add(topPanel, BorderLayout.NORTH);
 
-        JPanel radioPanel = new JPanel();
-        radioPanel.setLayout(new BoxLayout(radioPanel, BoxLayout.Y_AXIS));
-        radioPanel.setBackground(customColor);
+        JPanel centerPanel = new JPanel();
+        centerPanel.setLayout(new BoxLayout(centerPanel,BoxLayout.Y_AXIS));
+        centerPanel.setBackground(customColor);
 
-        // Create radio buttons
-        JRadioButton associationButton = new JRadioButton("Association");
-        JRadioButton aggregationButton = new JRadioButton("Aggregation");
-        JRadioButton compositionButton = new JRadioButton("Composition");
-        JRadioButton inheritanceButton = new JRadioButton("Inheritance");
+        JPanel fromPanel = new JPanel();
+        fromPanel.setLayout(new BoxLayout(fromPanel,BoxLayout.X_AXIS));
+        fromPanel.setBackground(customColor);
 
-        associationButton.setBackground(customColor);
-        aggregationButton.setBackground(customColor);
-        compositionButton.setBackground(customColor);
-        inheritanceButton.setBackground(customColor);
+        JLabel currentComponent = new JLabel(currentComponentName);
+        JLabel from = new JLabel("From");
+        from.setFont(new Font("Segoe UI Emoji", Font.BOLD, 14));
+        JLabel to = new JLabel("To");
+        to.setFont(new Font("Segoe UI Emoji", Font.BOLD, 14));
 
-        // Group the radio buttons
-        ButtonGroup group = new ButtonGroup();
-        group.add(associationButton);
-        group.add(aggregationButton);
-        group.add(compositionButton);
-        group.add(inheritanceButton);
+        fromPanel.add(from);
+        fromPanel.add(Box.createHorizontalStrut(20));
+        fromPanel.add(currentComponent);
+        fromPanel.add(Box.createHorizontalGlue());
+        centerPanel.add(fromPanel);
 
-        radioPanel.add(Box.createVerticalStrut(20));
-        radioPanel.add(associationButton);
-        radioPanel.add(aggregationButton);
-        radioPanel.add(compositionButton);
-        radioPanel.add(inheritanceButton);
-        radioPanel.add(Box.createVerticalGlue());
+        JPanel toPanel = new JPanel();
+        toPanel.setLayout(new BoxLayout(toPanel,BoxLayout.X_AXIS));
+        toPanel.setBackground(customColor);
 
-        panel.add(radioPanel, BorderLayout.CENTER);
+        toPanel.add(to);
+        toPanel.add(Box.createHorizontalGlue());
+        centerPanel.add(toPanel);
+
+        nameToComponentMap = new HashMap<>();
+        DefaultListModel<String> listModel = new DefaultListModel<>();
+
+        // Populate the list model and the map
+        int counter = 1;
+        for (UMLComponent component : components) {
+            String name = (component.getName() != null) ? component.getName() : "Component " + counter++;
+            listModel.addElement(name);
+            nameToComponentMap.put(name, component);
+        }
+
+        componentList = new JList<>(listModel);
+        componentList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        JScrollPane scrollPane = new JScrollPane(componentList);
+
+        centerPanel.add(scrollPane);
+        panel.add(centerPanel, BorderLayout.CENTER);
 
         JPanel buttonPanel = new JPanel();
         buttonPanel.setLayout(new FlowLayout(FlowLayout.CENTER)); // Center align buttons
@@ -233,17 +136,20 @@ public class ConnectionDialog extends JDialog{
         okButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                // Perform action for OK button
-                String selectedOption = getClassSelectedOption(associationButton, aggregationButton, compositionButton, inheritanceButton);
-                ConnectionDialog.this.optionSelected = selectedOption;
-                System.out.println("Selected Option: " + selectedOption);
-                dispose(); // Close dialog
+
+                selectedComponentName = componentList.getSelectedValue();
+                selectedComponent = nameToComponentMap.get(selectedComponentName); // set selected comp
+
+                System.out.println("Selected Component: " + selectedComponentName);
+                dispose();
+
             }
         });
 
         cancelButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                selectedComponent = null;
                 dispose(); // Close dialog on Cancel
             }
         });
@@ -261,24 +167,9 @@ public class ConnectionDialog extends JDialog{
         //dialog.setShape(new java.awt.geom.RoundRectangle2D.Double(0, 0, dialog.getWidth(), dialog.getHeight(), 30, 30));
 
         setVisible(true);
-
     }
 
-    private String getClassSelectedOption(JRadioButton associationButton, JRadioButton aggregationButton, JRadioButton compositionButton, JRadioButton inheritanceButton) {
-        if (associationButton.isSelected()) {
-            return "Association";
-        } else if (aggregationButton.isSelected()) {
-            return "Aggregation";
-        } else if (compositionButton.isSelected()) {
-            return "Composition";
-        } else if (inheritanceButton.isSelected()) {
-            return "Inheritance";
-        } else {
-            return "No option selected";
-        }
-    }
-
-    public String getOptionSelected() {
-        return optionSelected;
+    public UMLComponent getSelectedComponent() {
+        return selectedComponent;
     }
 }

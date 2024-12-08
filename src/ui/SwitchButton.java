@@ -81,7 +81,7 @@ class SwitchButton extends JComponent {
         return this.isOn() ? "ON" : "OFF";
     }
 
-    public static void main(String[] args) {
+    /*public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
             JFrame frame = new JFrame("Custom Switch Button");
             frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -96,5 +96,5 @@ class SwitchButton extends JComponent {
             frame.add(switchButton);
             frame.setVisible(true);
         });
-    }
+    }*/
 }

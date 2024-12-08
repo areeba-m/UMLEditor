@@ -9,7 +9,7 @@ import java.awt.dnd.DropTargetListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
-import static ui.UMLEditorForm.isConnectMode;
+//import static ui.UMLEditorForm.isConnectMode;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @JsonIgnoreProperties({"accessibleContext", "graphicsConfiguration", "rootPane", "layeredPane", "contentPane", "transferHandler", "inputMap", "actionMap", "clientProperty", "focusTraversalPolicyProvider", "focusCycleRoot"}) // Ignore JPanel's internal properties
@@ -87,8 +87,8 @@ public abstract class UMLDiagram extends JPanel{
                     }
                 }
 
-                if(isConnectMode)
-                    handleComponentClick(component);
+                /*if(isConnectMode)
+                    handleComponentClick(component);*/
             }
         });
     }
@@ -153,7 +153,7 @@ public abstract class UMLDiagram extends JPanel{
         }
     }
 
-    protected void handleComponentClick(UMLComponent component) {
+    /*protected void handleComponentClick(UMLComponent component) {
         if (selectedComponent1 == null) {
             selectedComponent1 = component; // First component selected
             System.out.println("Selected first component: " + selectedComponent1.getName());
@@ -169,8 +169,9 @@ public abstract class UMLDiagram extends JPanel{
             selectedComponent1 = null;
             selectedComponent2 = null;
         }
-    }
-    protected abstract void createConnection(UMLComponent comp1, UMLComponent comp2);
+    }*/
+
+    public abstract int createConnection(UMLComponent comp1, UMLComponent comp2, String type);
 
     public UMLComponent getSelectedComponent() {
         for (UMLComponent component : components) {

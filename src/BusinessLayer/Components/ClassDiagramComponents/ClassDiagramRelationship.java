@@ -26,10 +26,6 @@ public class ClassDiagramRelationship extends UMLComponent{
     private UMLComponent from;
     private UMLComponent to;
 
-    //for inheritance only
-    ClassBox parent;
-    ArrayList<ClassBox> child;
-
     public ClassDiagramRelationship(UMLComponent from, UMLComponent to, String name)
     {
         super();
@@ -176,64 +172,64 @@ public class ClassDiagramRelationship extends UMLComponent{
         }
     }
 
-private void drawHollowDiamond(Graphics2D g2d, int x, int y) {
-    int size = 8;
+    private void drawHollowDiamond(Graphics2D g2d, int x, int y) {
+        int size = 8;
 
-    int dx = x - point.x;
-    int dy = y - point.y;
-    // Normalize the direction vector
-    double distance = Math.sqrt(dx * dx + dy * dy);
-    double unitDx = dx / distance;
-    double unitDy = dy / distance;
+        int dx = x - point.x;
+        int dy = y - point.y;
+        // Normalize the direction vector
+        double distance = Math.sqrt(dx * dx + dy * dy);
+        double unitDx = dx / distance;
+        double unitDy = dy / distance;
 
-    // Offset the diamond position slightly back from the endpoint
-    double offsetX = x - unitDx * size;
-    double offsetY = y - unitDy * size;
+        // Offset the diamond position slightly back from the endpoint
+        double offsetX = x - unitDx * size;
+        double offsetY = y - unitDy * size;
 
-    // Calculate the line endpoint so it stops at the diamond
-    int trimmedX = (int) (offsetX);
-    int trimmedY = (int) (offsetY);
+        // Calculate the line endpoint so it stops at the diamond
+        int trimmedX = (int) (offsetX);
+        int trimmedY = (int) (offsetY);
 
-    // Draw the trimmed line
-    g2d.drawLine(point.x, point.y, trimmedX, trimmedY);
+        // Draw the trimmed line
+        g2d.drawLine(point.x, point.y, trimmedX, trimmedY);
 
-    // Draw the hollow diamond
-    Path2D.Double diamond = new Path2D.Double();
-    diamond.moveTo(offsetX, offsetY - size); // top
-    diamond.lineTo(offsetX + size, offsetY); // right
-    diamond.lineTo(offsetX, offsetY + size); // bottom
-    diamond.lineTo(offsetX - size, offsetY); // left
-    diamond.closePath();
+        // Draw the hollow diamond
+        Path2D.Double diamond = new Path2D.Double();
+        diamond.moveTo(offsetX, offsetY - size); // top
+        diamond.lineTo(offsetX + size, offsetY); // right
+        diamond.lineTo(offsetX, offsetY + size); // bottom
+        diamond.lineTo(offsetX - size, offsetY); // left
+        diamond.closePath();
 
-    // Fill the diamond
-    g2d.setColor(Color.WHITE);
-    g2d.fill(diamond);
+        // Fill the diamond
+        g2d.setColor(Color.WHITE);
+        g2d.fill(diamond);
 
-    // Draw the outline of the diamond
-    g2d.setColor(Color.BLACK);
-    g2d.draw(diamond);
+        // Draw the outline of the diamond
+        g2d.setColor(Color.BLACK);
+        g2d.draw(diamond);
 
 
-    g2d.setColor(Color.BLACK); // Set text color
-    // Draw multiplicities
-    if (startMultiplicity != null && !startMultiplicity.isEmpty()) {
-        // Strip brackets if present
-        String cleanedStart = startMultiplicity.replace("[", "").replace("]", "");
+        g2d.setColor(Color.BLACK); // Set text color
+        // Draw multiplicities
+        if (startMultiplicity != null && !startMultiplicity.isEmpty()) {
+            // Strip brackets if present
+            String cleanedStart = startMultiplicity.replace("[", "").replace("]", "");
 
-        // Position the start multiplicity further behind the point, opposite direction towards the diamond
-        int startX = (int) (point.x - unitDx * (size - 30)); // Move further back from the point towards the diamond
-        int startY = (int) (point.y - unitDy * (size - 30)); // Similarly adjust the Y position
-        g2d.drawString(cleanedStart, startX, startY);
+            // Position the start multiplicity further behind the point, opposite direction towards the diamond
+            int startX = (int) (point.x - unitDx * (size - 30)); // Move further back from the point towards the diamond
+            int startY = (int) (point.y - unitDy * (size - 30)); // Similarly adjust the Y position
+            g2d.drawString(cleanedStart, startX, startY);
+        }
+
+        if (endMultiplicity != null && !endMultiplicity.isEmpty()) {
+            // Strip brackets if present
+            String cleanedEnd = endMultiplicity.replace("[", "").replace("]", "");
+            int endX = (int) (offsetX - unitDx * (size + 10)); // Position behind the diamond
+            int endY = (int) (offsetY - unitDy * (size + 10));
+            g2d.drawString("1", endX, endY);
+        }
     }
-
-    if (endMultiplicity != null && !endMultiplicity.isEmpty()) {
-        // Strip brackets if present
-        String cleanedEnd = endMultiplicity.replace("[", "").replace("]", "");
-        int endX = (int) (offsetX - unitDx * (size + 10)); // Position behind the diamond
-        int endY = (int) (offsetY - unitDy * (size + 10));
-        g2d.drawString("1", endX, endY);
-    }
-}
 
 
     // Method to draw a filled diamond (composition)
@@ -312,7 +308,7 @@ private void drawHollowDiamond(Graphics2D g2d, int x, int y) {
         g2d.setColor(Color.WHITE);
         g2d.fill(triangle);
 
-// Draw the outline of the triangle with black
+        // Draw the outline of the triangle with black
         g2d.setColor(Color.BLACK);
         g2d.draw(triangle);
 

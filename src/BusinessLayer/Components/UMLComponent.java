@@ -177,6 +177,7 @@ public abstract class UMLComponent extends JComponent {
     {
         this.textArea = txtArea;
     }
+
     public void setIsGridPanel(boolean flag)
     {
         this.isGridPanel = flag;

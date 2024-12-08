@@ -88,18 +88,6 @@ public class UseCase extends UMLComponent {
         setPoint(p);
     }
 
-    public void handleUseCaseMousePressed(MouseEvent e){
-
-    }
-
-    public void handleUseCaseMouseReleased(MouseEvent e){
-
-    }
-
-    public void handleUseCaseMouseDragged(MouseEvent e){
-
-    }
-
     @Override
     public void updateFromTextArea() {
 

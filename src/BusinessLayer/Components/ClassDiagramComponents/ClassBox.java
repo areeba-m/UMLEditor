@@ -13,24 +13,25 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 @JsonIgnoreProperties({
-        "accessibleContext",
-        "graphicsConfiguration",
-        "rootPane",
-        "layeredPane",
-        "contentPane",
-        "transferHandler",
-        "inputMap",
-        "actionMap",
-        "clientProperty",
-        "focusTraversalPolicyProvider",
-        "focusCycleRoot",
-        "UI", // Another internal property that could be ignored
-        "componentOrientation", // Component orientation
-        "focusTraversalPolicy", // Focus policy
-        "focusOwner" // Current focus owner
+    "accessibleContext",
+    "graphicsConfiguration",
+    "rootPane",
+    "layeredPane",
+    "contentPane",
+    "transferHandler",
+    "inputMap",
+    "actionMap",
+    "clientProperty",
+    "focusTraversalPolicyProvider",
+    "focusCycleRoot",
+    "UI", // Another internal property that could be ignored
+    "componentOrientation", // Component orientation
+    "focusTraversalPolicy", // Focus policy
+    "focusOwner" // Current focus owner
 })
 
 public class ClassBox extends UMLComponent {
+
     ArrayList<String> attributes;
     ArrayList<String> methods;
     ArrayList<ClassDiagramRelationship> relationships;
@@ -38,9 +39,7 @@ public class ClassBox extends UMLComponent {
     int width;
     //String classType; shifted to UMLComponent
 
-    public ClassBox()
-    {
-        //setPreferredSize(new Dimension(200,200));
+    public ClassBox() {
 
         this.point = new Point(0,0);
         this.name = "";
@@ -90,8 +89,7 @@ public class ClassBox extends UMLComponent {
         repaint();
     }
 
-    public boolean checkAttributePresence(String value)
-    {
+    public boolean checkAttributePresence(String value) {
         for(int i = 0; i < attributes.size();i++)
         {
             if(attributes.get(i).equals(value))
@@ -101,8 +99,7 @@ public class ClassBox extends UMLComponent {
         }
         return false;
     }
-    public boolean checkMethodsPresence(String value)
-    {
+    public boolean checkMethodsPresence(String value) {
         for(int i = 0; i < methods.size();i++)
         {
             if(methods.get(i).equals(value))
@@ -113,8 +110,7 @@ public class ClassBox extends UMLComponent {
         return false;
     }
 
-    public void addMethods(String[] list)
-    {
+    public void addMethods(String[] list) {
         for(int i = 0; i < list.length; i++)
         {
             if(!checkMethodsPresence(list[i])) {
@@ -122,36 +118,28 @@ public class ClassBox extends UMLComponent {
             }
         }
         updatePreferredSize();
-        // Update bounds to avoid rendering issues
         setBounds(getX(), getY(), getPreferredSize().width, getPreferredSize().height);
-        //point.setLocation(getX(), getY());
-        System.out.println("Height: "+height+", width: "+width);
-//        revalidate();
-//        repaint();
+
     }
 
-     public void addAttribute(String[] list)
-     {
-         for(int i = 0; i < list.length; i++)
-         {
+    public void addAttribute(String[] list) {
+         for(int i = 0; i < list.length; i++) {
              if(!checkAttributePresence(list[i])) {
                  attributes.add(list[i]);
              }
          }
          updatePreferredSize();
-         // Update bounds to avoid rendering issues
          setBounds(getX(), getY(), getPreferredSize().width, getPreferredSize().height);
-         //point.setLocation(getX(), getY());
-         System.out.println("Height: "+height+", width: "+width);
-//         revalidate();
-//         repaint();
-     }
+
+    }
+
     public void setAttributes(ArrayList<String> attributesList) {
         if (attributesList != null) {
             this.attributes.clear();
             this.attributes.addAll((Collection<? extends String>) attributesList);
         }
     }
+
     public void setPoint(Point point) {
         if(point == null)
         {
@@ -175,8 +163,7 @@ public class ClassBox extends UMLComponent {
         }
     }
 
-    public Point getPoint()
-    {
+    public Point getPoint() {
         return point;
     }
 
@@ -185,7 +172,7 @@ public class ClassBox extends UMLComponent {
         text += "\n";
         //starting attributes
 
-            text += "--";
+        text += "--";
         text += "\n";
         if(attributes.size() <= 0) {
             text += "\n";
@@ -212,9 +199,6 @@ public class ClassBox extends UMLComponent {
         getParent().repaint();
     }
 
-    public void handleClassBoxMouseReleased(MouseEvent e)
-    {
-    }
     public void handleClassBoxMouseDragged(MouseEvent e)
     {
         if (point != null) {
@@ -234,6 +218,7 @@ public class ClassBox extends UMLComponent {
     public void draw(Graphics g) {
 
     }
+
     @Override
     public void setMethods(java.util.List<Object> methods) {
         if (methods != null) {
@@ -246,6 +231,7 @@ public class ClassBox extends UMLComponent {
             }
         }
     }
+
     @Override
     public void setAttributes(java.util.List<Object> attributes) {
         if (attributes != null) {
@@ -292,8 +278,8 @@ public class ClassBox extends UMLComponent {
             //System.out.println("height: "+ boxHeight+ ", width: "+boxWidth);
 
             // Set up drawing starting coordinates for the box
-            x = (int) point.getX();
-            y = (int) point.getY();
+            x = (int) point.getX() +2;
+            y = (int) point.getY()+2;
 
             // Draw the class box
             g2d.drawRect(x, y, boxWidth, boxHeight);
@@ -324,9 +310,6 @@ public class ClassBox extends UMLComponent {
             // Leave attributes and methods sections empty
             int attributeY = dividerY1 + padding+10;
             for (String attribute : attributes) {
-//                g2d.drawString(attribute, x + padding, attributeY);
-//                attributeY += 20;
-                // Move to the next line
                 attributeY += 20;
             }
 
@@ -368,8 +351,8 @@ public class ClassBox extends UMLComponent {
            // System.out.println("height: "+ boxHeight+ ", width: "+boxWidth);
 
             // Set up drawing starting coordinates for the box
-            x = (int) point.getX();
-            y = (int) point.getY();
+            x = (int) point.getX()+2;
+            y = (int) point.getY()+2;
 
             // Draw the class box
             g2d.drawRect(x, y, boxWidth, boxHeight);
@@ -401,8 +384,7 @@ public class ClassBox extends UMLComponent {
             // Draw attributes
             int attributeY = dividerY1 + padding+10;
             for (String attribute : attributes) {
-//                g2d.drawString(attribute, x + padding, attributeY);
-//                attributeY += 20;
+
                 if (attribute.startsWith("_") && attribute.endsWith("_")) {//underlining static attribute
                     // Remove the underscores for drawing the string
                     String displayText = attribute.substring(1, attribute.length() - 1);
@@ -472,8 +454,8 @@ public class ClassBox extends UMLComponent {
             // Get FontMetrics for measuring string widths
             FontMetrics metrics = g2d.getFontMetrics(g2d.getFont());
             // Set up drawing starting coordinates for the box
-            x = (int) point.getX();
-            y = (int) point.getY();
+            x = (int) point.getX()+2;
+            y = (int) point.getY()+2;
 
             // Draw the class box
             g2d.drawRect(x, y, boxWidth, boxHeight);
@@ -600,12 +582,12 @@ public class ClassBox extends UMLComponent {
         width = boxWidth;
         if(classType.equals("Interface"))
         {
-            setPreferredSize(new Dimension(boxWidth, boxHeight+40));
+            setPreferredSize(new Dimension(boxWidth+5, boxHeight+45));
 
         }
         else {
             // Update preferred size
-            setPreferredSize(new Dimension(boxWidth, boxHeight+20));
+            setPreferredSize(new Dimension(boxWidth+5, boxHeight+20));
         }
         revalidate(); // Notify the layout manager to adjust
         repaint();    // Request a repaint for the updated size
@@ -657,4 +639,5 @@ public class ClassBox extends UMLComponent {
         // Return the JSON object
         return json;
     }
+
 }
