@@ -1,0 +1,21 @@
+{
+  "components" : [ {
+    "name" : "UseCase1",
+    "bounds" : {
+      "x" : 50,
+      "width" : 200,
+      "y" : 50,
+      "height" : 200
+    },
+    "type" : "UseCase"
+  }, {
+    "name" : "Actor1",
+    "bounds" : {
+      "x" : 50,
+      "width" : 50,
+      "y" : 50,
+      "height" : 100
+    },
+    "type" : "Actor"
+  } ]
+}
