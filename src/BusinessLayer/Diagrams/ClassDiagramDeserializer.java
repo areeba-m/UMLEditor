@@ -13,8 +13,21 @@ import org.json.JSONObject;
 import java.awt.*;
 import java.io.IOException;
 
+/**
+ * A custom deserializer for {@link ClassDiagram} objects, used to deserialize JSON representations
+ * into Java objects. This class extends {@link JsonDeserializer}.
+ */
 public class ClassDiagramDeserializer extends JsonDeserializer<ClassDiagram> {
 
+    /**
+     * Deserializes a JSON representation of a {@link ClassDiagram} into a Java object.
+     *
+     * @param parser  the JSON parser provided by Jackson
+     * @param context the deserialization context provided by Jackson
+     * @return the deserialized {@link ClassDiagram} object
+     * @throws IOException              if an I/O error occurs during parsing
+     * @throws JsonProcessingException if the JSON content cannot be processed
+     */
     @Override
     public ClassDiagram deserialize(JsonParser parser, DeserializationContext context)
             throws IOException, JsonProcessingException {

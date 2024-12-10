@@ -24,25 +24,50 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Map;
+
+/**
+ * Represents a Use Case Diagram in the UML editor.
+ * Extends {@link UMLDiagram} and provides functionality specific to Use Case diagrams.
+ *
+ * <p>This class supports adding, removing, rendering components, and managing connections
+ * between components like actors, use cases, and relationships.</p>
+ */
 @JsonIgnoreProperties({"accessibleContext", "graphicsConfiguration", "rootPane", "layeredPane", "contentPane", "transferHandler", "inputMap", "actionMap", "clientProperty", "focusTraversalPolicyProvider", "focusCycleRoot"}) // Ignore JPanel's internal properties
 public class UseCaseDiagram extends UMLDiagram {
 
+    /**
+     * Constructs a new UseCaseDiagram with an empty list of components.
+     */
     public UseCaseDiagram(){
         super();
         components = new ArrayList<>();
 
     }
 
+    /**
+     * Returns the list of components in the diagram.
+     *
+     * @return an {@link ArrayList} of {@link UMLComponent}.
+     */
     @Override
     public ArrayList<UMLComponent> getListOfComponents() {
         return components;
     }
 
+    /**
+     * Returns the number of components in the diagram.
+     *
+     * @return the component count as an integer.
+     */
     @Override
     public int getComponentsCount() {
         return components.size();
     }
-
+    /**
+     * Adds a new component to the diagram.
+     *
+     * @param component the {@link UMLComponent} to add.
+     */
     @Override
     public void addComponent(UMLComponent component) {
 
@@ -61,6 +86,11 @@ public class UseCaseDiagram extends UMLDiagram {
         repaint();
     }
 
+    /**
+     * Removes a component from the diagram.
+     *
+     * @param component the {@link UMLComponent} to remove.
+     */
     @Override
     public void removeComponent(UMLComponent component) {
         components.remove(component);
@@ -74,6 +104,22 @@ public class UseCaseDiagram extends UMLDiagram {
 
     }
 
+    /**
+     * Creates a connection between two components in the diagram.
+     *
+     * @param comp1 the first {@link UMLComponent}.
+     * @param comp2 the second {@link UMLComponent}.
+     * @param type  the type of connection ("Association", "Include", "Extend").
+     * @return an integer indicating the connection status:
+     *         <ul>
+     *         <li>0: Success</li>
+     *         <li>1: Cannot associate two use cases</li>
+     *         <li>2: Cannot include an actor</li>
+     *         <li>3: Cannot extend an actor</li>
+     *         <li>4: Invalid component</li>
+     *         <li>5: Self-connection not allowed</li>
+     *         </ul>
+     */
     @Override
     public int createConnection(UMLComponent comp1, UMLComponent comp2, String type) {
 
@@ -117,6 +163,11 @@ public class UseCaseDiagram extends UMLDiagram {
         return 0; // normal
     }
 
+    /**
+     * Adds multiple components to the diagram.
+     *
+     * @param component the {@link UMLComponent} to add.
+     */
     @Override
     public void addComponents(UMLComponent component) {
         if(components.contains(component)){
@@ -134,6 +185,11 @@ public class UseCaseDiagram extends UMLDiagram {
         repaint();
     }
 
+    /**
+     * Converts the diagram to a JSON representation.
+     *
+     * @return a {@link JSONObject} representing the Use Case diagram.
+     */
     public JSONObject toJson() {
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.enable(SerializationFeature.INDENT_OUTPUT); // Pretty print JSON
@@ -166,6 +222,11 @@ public class UseCaseDiagram extends UMLDiagram {
         return useCaseDiagramJson;
     }
 
+    /**
+     * Saves the diagram to a file in JSON format.
+     *
+     * @param filePath the file path to save the diagram.
+     */
     public void saveToFile(String filePath) {
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.enable(SerializationFeature.INDENT_OUTPUT); // Enable pretty print
@@ -189,7 +250,12 @@ public class UseCaseDiagram extends UMLDiagram {
     }
 
 
-    // Load method
+    /**
+     * Loads a Use Case diagram from a JSON file.
+     *
+     * @param filePath the file path of the JSON file.
+     * @return a {@link UMLDiagram} object representing the loaded diagram, or {@code null} on failure.
+     */
     public UMLDiagram loadFromFile(String filePath) {
         ObjectMapper objectMapper = new ObjectMapper();
         // Register the custom deserializer for ClassDiagram

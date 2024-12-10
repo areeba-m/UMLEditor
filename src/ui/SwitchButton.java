@@ -5,7 +5,10 @@ import java.awt.*;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-
+/**
+ * Custom switch button class for toggle on and off
+ *
+ */
 class SwitchButton extends JComponent {
     private String toolTipText;
     private boolean isOn = false; // Toggle state

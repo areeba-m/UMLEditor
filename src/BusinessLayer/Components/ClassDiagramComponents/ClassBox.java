@@ -11,7 +11,10 @@ import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.Collection;
-
+/**
+ * Component to draw class box of a class diagram
+ *
+ */
 @JsonIgnoreProperties({
     "accessibleContext",
     "graphicsConfiguration",
@@ -29,7 +32,6 @@ import java.util.Collection;
     "focusTraversalPolicy", // Focus policy
     "focusOwner" // Current focus owner
 })
-
 public class ClassBox extends UMLComponent {
 
     ArrayList<String> attributes;
@@ -39,6 +41,9 @@ public class ClassBox extends UMLComponent {
     int width;
     //String classType; shifted to UMLComponent
 
+    /**
+     * Constructs a Class box with default settings and initializes attributes
+     */
     public ClassBox() {
 
         this.point = new Point(0,0);

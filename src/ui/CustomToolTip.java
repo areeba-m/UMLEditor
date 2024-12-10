@@ -3,6 +3,10 @@ package ui;
 import javax.swing.*;
 import java.awt.*;
 
+/**
+ * Custom Tool tip for enhanced UI, used in toggle switch button
+ *
+ */
 public class CustomToolTip extends JToolTip {
     private JLabel label;
 

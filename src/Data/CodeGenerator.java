@@ -11,6 +11,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Hashtable;
 
+/**
+ * Code Generation class generates java code files for valid class diagram
+ *
+ */
 public class CodeGenerator {
 
     ArrayList<UMLComponent> components;
@@ -25,6 +29,12 @@ public class CodeGenerator {
         this.components = components;
     }
 
+    /**
+     * Method to generate code
+     *
+     * @param directory the directory to save java files to
+     * @throws IOException if writing to file fails
+     */
     public void generateCode(File directory) throws IOException {
 
         for (UMLComponent component : components) {
@@ -61,6 +71,12 @@ public class CodeGenerator {
         }
     }
 
+    /**
+     * Extracts attributes from class diagram into an array of hashtable with attribute information
+     *
+     * @param originalAttributes the raw attributes from class diagram
+     * @return arraylist of hashtable with sorted attributes
+     */
     public ArrayList<Hashtable<String, String>> generateClassAttributes(ArrayList<String> originalAttributes) {
         ArrayList<Hashtable<String, String>> classAttributes = new ArrayList<>();
 
@@ -113,6 +129,12 @@ public class CodeGenerator {
         return classAttributes;
     }
 
+    /**
+     * Extracts methods from class diagram into an array of hashtable with method information
+     *
+     * @param originalMethods the raw methods from class diagram
+     * @return arraylist of hashtable with sorted methods
+     */
     public ArrayList<Hashtable<String, Object>> generateClassMethods(ArrayList<String> originalMethods) {
 
         ArrayList<Hashtable<String, Object>> classMethods = new ArrayList<>();
@@ -130,6 +152,12 @@ public class CodeGenerator {
         return classMethods;
     }
 
+    /**
+     * Extracts methods parameters from a string of parameters in one method
+     *
+     * @param parameters the parameter from class diagram of a method
+     * @return arraylist of hashtable with sorted parameters
+     */
     public ArrayList<Hashtable<String, String>> generateMethodParameters(String parameters){
 
         ArrayList<Hashtable<String, String>> methodParameters = new ArrayList<>();
@@ -167,7 +195,12 @@ public class CodeGenerator {
         return methodParameters;
     }
 
-
+    /**
+     * Extracts one method from raw method given in class diagram
+     *
+     * @param method the raw methods from class diagram
+     * @return hashtable with sorted method information
+     */
     public Hashtable<String,Object> getOneMethod(String method){
 
         Hashtable<String, Object> methodInfo = new Hashtable<>();
@@ -232,6 +265,15 @@ public class CodeGenerator {
         return methodInfo;
     }
 
+    /**
+     * Extracts relationship information of a component, updates original class information hashtable
+     *
+     * @param component the component with relationship information
+     * @param classInfo the hashtable of the component
+     * @param classAttributes the list of sorted attributes
+     * @param classMethods the list of sorted methods
+     *
+     */
     public void generateRelationships(ClassBox component, Hashtable<String, Object> classInfo,
                                       ArrayList<Hashtable<String, String>> classAttributes,
                                       ArrayList<Hashtable<String, Object>> classMethods) {
@@ -325,6 +367,13 @@ public class CodeGenerator {
         }
     }
 
+    /**
+     * Writes class information to a java file
+     *
+     * @param outputDir the directory to save file to
+     * @param classInfo the component with information
+     *
+     */
     private void writeToFile(File outputDir, Hashtable<String,Object> classInfo) throws IOException {
         String className = (String)classInfo.get("class_name");
         String classType = (String)classInfo.get("class_type"); // abstract, interface

@@ -8,6 +8,11 @@ import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.List;
+
+
+/**
+ * Component class for use cases
+ */
 @JsonIgnoreProperties({
         "accessibleContext",
         "graphicsConfiguration",
@@ -28,12 +33,21 @@ import java.util.List;
 public class UseCase extends UMLComponent {
     private ArrayList<Actor> actors = new ArrayList<>();
 
+    /**
+     * constructor for use case class
+     * @param name name of use case
+     */
     public UseCase(String name) {
         super();
         this.name = name;
         setPreferredSize(new Dimension(200,200));
     }
 
+    /**
+     * paint component of a use case
+     *
+     * @param g graphics
+     */
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
@@ -108,6 +122,11 @@ public class UseCase extends UMLComponent {
 
     }
 
+    /**
+     * Method to convert use case to json for loading and saving
+     *
+     * @return JSONObject
+     */
     @Override
     public JSONObject toJSON() {
         JSONObject json = new JSONObject();
@@ -125,6 +144,11 @@ public class UseCase extends UMLComponent {
         return json;
     }
 
+    /**
+     * Method to add an actor to a use case
+     *
+     * @param actor actor to add to arraylist
+     */
     public void addActor(Actor actor) {
         if (!actors.contains(actor)) {
             actors.add(actor);
@@ -132,6 +156,11 @@ public class UseCase extends UMLComponent {
         }
     }
 
+    /**
+     * Method to remove an actor to a use case
+     *
+     * @param actor actor to remove to arraylist
+     */
     public void removeActor(Actor actor) {
         if (actors.contains(actor)) {
             actors.remove(actor);

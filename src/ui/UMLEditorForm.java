@@ -22,6 +22,10 @@ import java.awt.*;
 import java.awt.event.*;
 import java.io.File;
 
+/**
+ * UML Editor form contains the basic ui of the application and the main method
+ *
+ */
 public class UMLEditorForm extends JFrame {
 
     // menu bar components

@@ -13,7 +13,10 @@ import java.awt.event.MouseEvent;
 
 import static BusinessLayer.Diagrams.UMLDiagram.components;
 
-
+/**
+ * Popup menu class extends JPopup for a customized menu option for relationships
+ *
+ */
 public class PopupMenu extends JPopupMenu {
 
     private JMenuItem deleteItem;

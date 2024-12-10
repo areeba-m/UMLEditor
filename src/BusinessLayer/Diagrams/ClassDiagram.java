@@ -23,6 +23,14 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Map;
 
+/**
+ * Represents a Class Diagram, extending the {@link UMLDiagram}.
+ * This class handles the rendering, addition, removal, and management of UML components,
+ * including {@link ClassBox} and {@link ClassDiagramRelationship}.
+ * It provides functionality for saving the diagram to a JSON file and loading it back.
+ *
+ * <p>Annotations are used to ignore unnecessary properties during JSON serialization.</p>
+ */
 @JsonIgnoreProperties({"accessibleContext", "graphicsConfiguration", "rootPane", "layeredPane", "contentPane", "transferHandler", "inputMap", "actionMap", "clientProperty", "focusTraversalPolicyProvider", "focusCycleRoot"}) // Ignore JPanel's internal properties
 public class ClassDiagram extends UMLDiagram {
 
@@ -32,6 +40,11 @@ public class ClassDiagram extends UMLDiagram {
         this.name = "";
     }
 
+    /**
+     * Method to draw the components in class diagram
+     *
+     * @param g used to draw graphics
+     */
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
@@ -39,15 +52,27 @@ public class ClassDiagram extends UMLDiagram {
             component.repaint();
         }
     }
+    /**
+     * Method to return ArrayList of components added to diagram
+     * @return arraylist of components
+     */
     @Override
     public ArrayList<UMLComponent> getListOfComponents() {
         return components;
     }
-
+    /**
+     * Method to get count of components in class diagram
+     *@return count of components added to class diagram
+     */
     public int getComponentsCount() {
         return components.size();
     }
 
+    /**
+     * Method to add a component to the class diagram component's list
+     *
+     * @param component that has to be added
+     */
     @Override
     public void addComponent(UMLComponent component) {
         if(components.contains(component)){
@@ -65,6 +90,11 @@ public class ClassDiagram extends UMLDiagram {
         repaint();
     }
 
+    /**
+     * Method to add a component to the class diagram component's list
+     *
+     * @param component that has to be added
+     */
     public void addComponents(UMLComponent component) {
         if(components.contains(component)){
             System.out.println("COMPONENT EXISTS: called Add component for " + component);
@@ -80,6 +110,11 @@ public class ClassDiagram extends UMLDiagram {
         repaint();
     }
 
+    /**
+     * Method to remove a component from the component list
+     *
+     * @param component that has to be added
+     */
     @Override
     public void removeComponent(UMLComponent component) {
         if (components.contains(component)) { // Remove only if present
@@ -121,6 +156,14 @@ public class ClassDiagram extends UMLDiagram {
     public void renderComponents(Graphics g) {
 
     }
+    /**
+     * Method to create a connection between two components
+     *
+     * @param comp1 type components that need to be connected
+     * @param comp2 type components that need to be connected
+     * @param type relationship type
+     * @return int represents success or failure of connection creation
+     */
     @Override
     public int createConnection(UMLComponent comp1, UMLComponent comp2, String type) {
 
@@ -150,6 +193,11 @@ public class ClassDiagram extends UMLDiagram {
         return 0;
     }
 
+    /**
+     * Method to serialize class diagram to JSON format
+     *
+     * @return JSONObject having the serialized data of class diagram
+     */
     public JSONObject toJson() {
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.enable(SerializationFeature.INDENT_OUTPUT); // Pretty print JSON

@@ -19,6 +19,10 @@ import java.util.List;
 
 import static BusinessLayer.Diagrams.UMLDiagram.components;
 
+/**
+ * Abstract class UML Component extend JComponent for all components to be drawn
+ *
+ */
 @JsonIgnoreProperties({
         "accessibleContext",
         "graphicsConfiguration",

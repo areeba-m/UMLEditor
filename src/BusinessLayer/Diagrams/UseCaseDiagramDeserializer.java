@@ -1,3 +1,6 @@
+/**
+ * This package contains the business logic for handling deserialization of UseCase Diagrams.
+ */
 package BusinessLayer.Diagrams;
 
 import BusinessLayer.Components.ClassDiagramComponents.ClassBox;
@@ -15,6 +18,11 @@ import org.json.JSONObject;
 import java.awt.*;
 import java.io.IOException;
 
+
+/**
+ * Custom deserializer for the {@link UseCaseDiagram} class.
+ * including its components such as Actors, Use Cases, and Relationships.
+ */
 public class UseCaseDiagramDeserializer extends JsonDeserializer<UseCaseDiagram>{
         @Override
         public UseCaseDiagram deserialize(JsonParser parser, DeserializationContext context)

@@ -12,6 +12,11 @@ import java.util.ArrayList;
 //import static ui.UMLEditorForm.isConnectMode;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+/**
+ * Represents an abstract UML diagram.
+ * Provides a framework for managing UML components, rendering them,
+ * and handling user interactions such as drag-and-drop and popup menus.
+ */
 @JsonIgnoreProperties({"accessibleContext", "graphicsConfiguration", "rootPane", "layeredPane", "contentPane", "transferHandler", "inputMap", "actionMap", "clientProperty", "focusTraversalPolicyProvider", "focusCycleRoot"}) // Ignore JPanel's internal properties
 public abstract class UMLDiagram extends JPanel{
     String name;
@@ -29,17 +34,32 @@ public abstract class UMLDiagram extends JPanel{
     public abstract void removeComponent(UMLComponent component);
     public abstract void renderComponents(Graphics g);//draws all components on the canvas
 
+    /**
+     * Constructs a UMLDiagram with default settings, including layout and popup menu.
+     */
     public UMLDiagram(){
         setLayout(null);
         setPreferredSize(new Dimension(1000,1000));
 
         popupMenu = new PopupMenu(this);
     }
+    /**
+     * Gets the static list of UML components.
+     *
+     * @return List of UML components.
+     */
     public static ArrayList<UMLComponent> getComponentList()
     {
         return components;
     }
+
     public abstract ArrayList<UMLComponent> getListOfComponents();
+
+    /**
+     * Sets up drag-and-drop and mouse interactions for the given UML component.
+     *
+     * @param component The UML component to be configured.
+     */
     public void setupComponentForDiagram(UMLComponent component) {
         component.addMouseMotionListener(new MouseAdapter() {
             Point prevPoint;
@@ -97,9 +117,19 @@ public abstract class UMLDiagram extends JPanel{
     {
         return components.get(i);
     }
+    /**
+     * Saves the UML diagram to a file.
+     *
+     * @param fileName The file name to save the diagram.
+     */
     public void saveToFile(String fileName) {
     }
 
+    /**
+     * Sets the list of UML components in the diagram.
+     *
+     * @param componentList List of UML components to be set.
+     */
     public void setComponents(ArrayList<UMLComponent> componentList) {
         if (components != null) {
             this.components = new ArrayList<>(componentList);  // Copy the input list to the internal list
@@ -111,6 +141,12 @@ public abstract class UMLDiagram extends JPanel{
         }
     }
 
+    /**
+     * Loads a UML diagram from a file.
+     *
+     * @param fileName The file name to load the diagram from.
+     * @return The loaded UML diagram.
+     */
     public UMLDiagram loadFromFile(String fileName) {
         return null;
     }

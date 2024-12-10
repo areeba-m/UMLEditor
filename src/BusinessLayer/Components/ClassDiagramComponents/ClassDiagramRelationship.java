@@ -11,10 +11,15 @@ import java.awt.event.ComponentEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Path2D;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * Class diagram relationship class extends UML Component class
+ *
+ */
 public class ClassDiagramRelationship extends UMLComponent{
 
     Point centerPoint;
@@ -26,6 +31,12 @@ public class ClassDiagramRelationship extends UMLComponent{
     private UMLComponent from;
     private UMLComponent to;
 
+    /**
+     * Constructs a Class diagram relationship between two components given its type
+     * @param from for first component
+     * @param to for second component
+     * @param name the type of relationship to make: may be association, aggregation, composition, inheritance
+     */
     public ClassDiagramRelationship(UMLComponent from, UMLComponent to, String name)
     {
         super();
@@ -71,6 +82,10 @@ public class ClassDiagramRelationship extends UMLComponent{
 
     }
 
+    /**
+     * Method to handle click of a relationship component
+     *
+     */
     public void handleMousePressed()
     {
         String text = name;
@@ -113,6 +128,11 @@ public class ClassDiagramRelationship extends UMLComponent{
         // Repaint parent to clear artifacts
         getParent().repaint();
     }
+
+    /**
+     * Provides implementation of abstract method to update multiplicity
+     *
+     */
     @Override
     public void updateFromTextArea() {
         String[] sections = textArea.getText().split("\n--\n");
@@ -133,6 +153,10 @@ public class ClassDiagramRelationship extends UMLComponent{
         // Repaint to reflect changes
         repaint();
     }
+    /**
+     * Method to paint class diagram relationship component
+     * @param g graphics
+     */
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
@@ -401,6 +425,11 @@ public class ClassDiagramRelationship extends UMLComponent{
 
     }
 
+    /**
+     * Method to convert relationship to json object for loading and saving
+     *
+     * @return JSONObject
+     */
     public JSONObject toJSON() {
         JSONObject json = new JSONObject();
 

@@ -14,6 +14,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 
+/**
+ * Custom JDialog containing information about the class to make relationship with
+ *
+ */
 public class ConnectionDialog extends JDialog{
 
     //JDialog dialog;

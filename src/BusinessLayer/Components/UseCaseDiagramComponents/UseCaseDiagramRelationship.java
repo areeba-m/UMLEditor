@@ -10,7 +10,10 @@ import java.awt.*;
 import java.awt.event.*;
 import java.util.List;
 
-import static com.sun.java.accessibility.util.AWTEventMonitor.addActionListener;
+/**
+ * Use Case diagram relationship class extends UML Component class
+ *
+ */
 @JsonIgnoreProperties({
         "accessibleContext",
         "graphicsConfiguration",
@@ -37,6 +40,12 @@ public class UseCaseDiagramRelationship extends UMLComponent {
     private UMLComponent to;
     private String label;
 
+    /**
+     * Constructs a use case diagram relationship between two components given its type
+     * @param from for first component
+     * @param to for second component
+     * @param name the type of relationship to make: may be association, include, extend
+     */
     public UseCaseDiagramRelationship(UMLComponent from, UMLComponent to, String name) {
         super();
         this.from = from;
@@ -76,6 +85,10 @@ public class UseCaseDiagramRelationship extends UMLComponent {
         }
     }
 
+    /**
+     * Method to handle click of a relationship component
+     *
+     */
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);

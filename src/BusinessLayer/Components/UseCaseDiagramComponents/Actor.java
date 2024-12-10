@@ -5,8 +5,13 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.json.JSONObject;
 
 import java.awt.*;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
+/**
+ * Component class for Actor of Use Case diagram
+ */
 @JsonIgnoreProperties({
         "accessibleContext",
         "graphicsConfiguration",
@@ -27,6 +32,10 @@ import java.util.List;
 public class Actor extends UMLComponent {
     ArrayList<UseCase> useCases; //use cases connected to this actor
 
+    /**
+     * Constructor accepts name of actor
+     * @param name of actor
+     */
     public Actor(String name){
         super();
         this.name = name;
@@ -36,6 +45,10 @@ public class Actor extends UMLComponent {
 
     }
 
+    /**
+     * Paint component of actor class
+     * @param g graphics
+     */
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
@@ -139,6 +152,10 @@ public class Actor extends UMLComponent {
 
     }
 
+    /**
+     * Converts actor to json object
+     * @return JSONObject
+     */
     @Override
     public JSONObject toJSON() {
         JSONObject json = new JSONObject();
@@ -157,6 +174,11 @@ public class Actor extends UMLComponent {
         return json;
     }
 
+    /**
+     * Method to add use case to an actor
+     *
+     * @param useCase use case to add to arraylist
+     */
     public void addUseCase(UseCase useCase) {
         if (!useCases.contains(useCase)) {
             useCases.add(useCase);
@@ -164,6 +186,11 @@ public class Actor extends UMLComponent {
         }
     }
 
+    /**
+     * Method to remove use case from an actor
+     *
+     * @param useCase use case to remove from arraylist
+     */
     public void removeUseCase(UseCase useCase) {
         if (useCases.contains(useCase)) {
             useCases.remove(useCase);
